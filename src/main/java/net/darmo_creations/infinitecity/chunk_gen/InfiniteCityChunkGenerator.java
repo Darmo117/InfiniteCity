@@ -49,16 +49,17 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   );
 
   private static final int LAYER_1 = 0; // Bedrock
-  private static final int LAYER_2 = 1; // Thin terrain layer
-  private static final int LAYER_3 = 2; // Empty space with columns, bridges, arches, etc.
-  private static final int LAYER_4 = 200; // On-grid blocks
-  private static final int LAYER_5 = 400; // Empty space with desert landscaps atop blocks of previous layer
-  private static final int LAYER_6 = 550; // Random blocks with windowed facades
-  private static final int LAYER_7 = 750; // Empty space with structures, hanging walkways and columns around holes of next layer
-  private static final int LAYER_8 = 814; // Plain layer with on-grid square holes
-  private static final int LAYER_9 = 1014; // Empty space
-  private static final int LAYER_10 = 1114; // Top layer below which hang walkways, antennas and othe structures
-  private static final int TOP = 1328; // = 16 * 83
+  private static final int LAYER_2 = LAYER_1 + 1; // Thin terrain layer
+  private static final int LAYER_3 = LAYER_2 + 1; // Empty space with columns, bridges, arches, etc.
+  private static final int LAYER_4 = 200; // ?
+  private static final int LAYER_5 = LAYER_4 + 200; // ?
+  private static final int LAYER_6 = LAYER_5 + 150; // Random blocks with windowed facades
+  private static final int LAYER_7 = LAYER_6 + 200; // Empty space with structures, hanging walkways and columns around holes of next layer
+  private static final int LAYER_8 = LAYER_7 + 64; // Plain layer with on-grid square holes
+  private static final int LAYER_9 = LAYER_8 + 200; // Empty space with structures hanging below next layer
+  private static final int LAYER_10 = LAYER_9 + 100; // On-grid blocks
+  private static final int LAYER_11 = LAYER_10 + 200; // Empty space with desert landscapes atop blocks of previous layer
+  private static final int TOP = 1600; // = 16 * 100
   private static final int WORLD_HEIGHT = TOP - LAYER_1;
 
   private static final BlockState AIR = Blocks.AIR.getDefaultState();
@@ -68,8 +69,8 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
 
   private final InfiniteCityChunkGeneratorConfig config;
 
-  private final ChunkGridManager layer4GridManager = new ChunkGridManager(32, 6, 0, 0, false);
-  private final ChunkGridManager layer8GridManager = new ChunkGridManager(6, 13, 13, 13, true);
+  private final ChunkGridManager layer8GridManager = new ChunkGridManager(8, 10, -6, -6, true);
+  private final ChunkGridManager layer10GridManager = new ChunkGridManager(32, 4, 0, 0, false);
 
   public InfiniteCityChunkGenerator(InfiniteCityChunkGeneratorConfig config) {
     super(new FixedBiomeSource(config.biome()));
@@ -99,10 +100,10 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     final int chunkZ = chunkPos.z;
     generateBedrockLayer(chunk, mutable, chunkX, chunkZ);
     generateBottomLayer(chunk, mutable, chunkX, chunkZ);
-    this.generateBigBlocksLayer(chunk, mutable, chunkX, chunkZ, structureAccessor);
     this.generateBuildingsLayer(chunk, mutable, chunkX, chunkZ, noiseConfig);
     this.generateLayerWithHoles(chunk, mutable, chunkX, chunkZ);
     this.generateTopLayer(chunk, mutable, chunkX, chunkZ, noiseConfig);
+    this.generateBigBlocksLayer(chunk, mutable, chunkX, chunkZ, structureAccessor);
     return chunk;
   }
 
@@ -115,15 +116,15 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   }
 
   private void generateBigBlocksLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {
-    if (this.layer4GridManager.shouldBeFilled(chunkX, chunkZ))
-      fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_4, LAYER_5);
-    int edgeTop = LAYER_5 + 8;
-    this.layer4GridManager.isAtEdge(chunkX, chunkZ).ifPresent(d -> {
-      fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_5, edgeTop); // Block edge
+    if (this.layer10GridManager.shouldBeFilled(chunkX, chunkZ))
+      fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_10, LAYER_11);
+    int edgeTop = LAYER_11 + 8;
+    this.layer10GridManager.isAtEdge(chunkX, chunkZ).ifPresent(d -> {
+      fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_11, edgeTop); // Block edge
       generateDesertEgdePillars(chunk, mutable, chunkX, chunkZ, edgeTop);
       generateBigBlocksInnerEdges(chunk, mutable, chunkX, chunkZ, edgeTop, d);
     });
-    this.layer4GridManager.isPastEdge(chunkX, chunkZ)
+    this.layer10GridManager.isPastEdge(chunkX, chunkZ)
         .ifPresent(d -> generateBigBlocksOuterEdges(chunk, mutable, chunkX, chunkZ, edgeTop, d));
     this.generateDeserts(chunk, mutable, chunkX, chunkZ, edgeTop, structureAccessor);
   }
@@ -179,7 +180,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   }
 
   private static void generateBigBlocksOuterEdges(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int edgeTop, ChunkGridManager.HoleDirection holeDirection) {
-    final int blockBottomY = LAYER_4;
+    final int blockBottomY = LAYER_10;
     final int smallBlockBottomY = edgeTop - 2;
     final int smallBlockTopY = edgeTop + 2;
     switch (holeDirection) {
@@ -263,8 +264,8 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   }
 
   private void generateDeserts(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int edgeTop, StructureAccessor structureAccessor) {
-    if (this.layer4GridManager.shouldBeFilled(chunkX, chunkZ)
-        && this.layer4GridManager.isAtEdge(chunkX, chunkZ).isEmpty()) {
+    if (this.layer10GridManager.shouldBeFilled(chunkX, chunkZ)
+        && this.layer10GridManager.isAtEdge(chunkX, chunkZ).isEmpty()) {
       this.generateDunes(chunk, mutable, chunkX, chunkZ, structureAccessor);
       this.erodeDunesNearEdge(chunk, mutable, chunkX, chunkZ, edgeTop);
     }
@@ -278,27 +279,27 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
       final int x = getHPos(chunkX, dx);
       for (int dz = 0; dz < 16; dz++) {
         final int z = getHPos(chunkZ, dz);
-        final double sample = (sampler.sample(x, LAYER_5, z) + 1) * 10;
+        final double sample = (sampler.sample(x, LAYER_11, z) + 1) * 10;
         for (int dy = 0; dy < sample; dy++) {
-          chunk.setBlockState(mutable.set(x, LAYER_5 + dy, z), SAND, false);
+          chunk.setBlockState(mutable.set(x, LAYER_11 + dy, z), SAND, false);
         }
       }
     }
   }
 
   private void erodeDunesNearEdge(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int edgeTop) {
-    if (this.layer4GridManager.isAtEdge(chunkX - 1, chunkZ).isPresent()) {
+    if (this.layer10GridManager.isAtEdge(chunkX - 1, chunkZ).isPresent()) {
       for (int i = 0; i < 10; i++)
         fill(chunk, mutable, chunkX, chunkZ, i, i + 1, 0, 16, edgeTop + i, edgeTop + 16, AIR);
-    } else if (this.layer4GridManager.isAtEdge(chunkX + 1, chunkZ).isPresent()) {
+    } else if (this.layer10GridManager.isAtEdge(chunkX + 1, chunkZ).isPresent()) {
       for (int i = 0; i < 10; i++)
         fill(chunk, mutable, chunkX, chunkZ, 15 - i, 16 - i, 0, 16, edgeTop + i, edgeTop + 16, AIR);
     }
 
-    if (this.layer4GridManager.isAtEdge(chunkX, chunkZ - 1).isPresent()) {
+    if (this.layer10GridManager.isAtEdge(chunkX, chunkZ - 1).isPresent()) {
       for (int i = 0; i < 10; i++)
         fill(chunk, mutable, chunkX, chunkZ, 0, 16, i, i + 1, edgeTop + i, edgeTop + 16, AIR);
-    } else if (this.layer4GridManager.isAtEdge(chunkX, chunkZ + 1).isPresent()) {
+    } else if (this.layer10GridManager.isAtEdge(chunkX, chunkZ + 1).isPresent()) {
       for (int i = 0; i < 10; i++)
         fill(chunk, mutable, chunkX, chunkZ, 0, 16, 15 - i, 16 - i, edgeTop + i, edgeTop + 16, AIR);
     }

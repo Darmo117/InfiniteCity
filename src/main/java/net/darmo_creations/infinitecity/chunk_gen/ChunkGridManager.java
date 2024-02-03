@@ -29,6 +29,14 @@ public class ChunkGridManager {
     this.inverted = inverted;
   }
 
+  public int getBlockSize() {
+    return this.blockSize;
+  }
+
+  public int getBlockSpacing() {
+    return this.blockSpacing;
+  }
+
   /**
    * Indicate whether the chunk at the given coordinates should be filled, based on this grid’s settings.
    *

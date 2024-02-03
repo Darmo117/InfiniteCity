@@ -89,20 +89,19 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   public CompletableFuture<Chunk> populateNoise(Executor executor, Blender blender, NoiseConfig noiseConfig, StructureAccessor structureAccessor, Chunk chunk) {
     return CompletableFuture.supplyAsync(Util.debugSupplier(
         "wgen_fill_noise",
-        () -> this.populateNoise(noiseConfig, chunk, structureAccessor)
+        () -> this.populateNoise(chunk, structureAccessor)
     ), Util.getMainWorkerExecutor());
   }
 
-  private Chunk populateNoise(NoiseConfig noiseConfig, Chunk chunk, StructureAccessor structureAccessor) {
+  private Chunk populateNoise(Chunk chunk, StructureAccessor structureAccessor) {
     final BlockPos.Mutable mutable = new BlockPos.Mutable();
     final ChunkPos chunkPos = chunk.getPos();
     final int chunkX = chunkPos.x;
     final int chunkZ = chunkPos.z;
     generateBedrockLayer(chunk, mutable, chunkX, chunkZ);
     generateBottomLayer(chunk, mutable, chunkX, chunkZ);
-    this.generateBuildingsLayer(chunk, mutable, chunkX, chunkZ, noiseConfig);
+    this.generateBuildingsLayer(chunk, mutable, chunkX, chunkZ, structureAccessor);
     this.generateLayerWithHoles(chunk, mutable, chunkX, chunkZ);
-    this.generateTopLayer(chunk, mutable, chunkX, chunkZ, noiseConfig);
     this.generateBigBlocksLayer(chunk, mutable, chunkX, chunkZ, structureAccessor);
     return chunk;
   }
@@ -305,7 +304,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     }
   }
 
-  private void generateBuildingsLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, NoiseConfig noiseConfig) {
+  private void generateBuildingsLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {
     // TODO
   }
 
@@ -388,10 +387,6 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
       case NORTH_EAST -> fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, y1, y2, TERRAIN);
       case NORTH_WEST -> fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, y1, y2, TERRAIN);
     }
-  }
-
-  private void generateTopLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, NoiseConfig noiseConfig) {
-    // TODO
   }
 
   private static void fillChunkTerrain(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int bottomY, int topY) {

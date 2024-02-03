@@ -48,7 +48,7 @@ public class ChunkGridManager {
     return this.inverted != (this.isInBlock(chunkX, this.offsetX) && this.isInBlock(chunkZ, this.offsetZ));
   }
 
-  public Pair<Integer, Integer> getGridIJ(int chunkX, int chunkZ) {
+  public Pair<Integer, Integer> getGridXZ(int chunkX, int chunkZ) {
     return new Pair<>(this.getGridI(chunkX, this.offsetX), this.getGridI(chunkZ, this.offsetZ));
   }
 

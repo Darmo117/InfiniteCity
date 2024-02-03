@@ -316,13 +316,13 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     for (ChunkGridManager gm : LAYER_8_GRID_MANAGERS) {
       final int blockSize = gm.getBlockSize();
       final int totalSize = blockSize + gm.getBlockSpacing();
-      final var ij = gm.getGridIJ(chunkX, chunkZ);
-      final int i = ij.getLeft();
-      final int j = ij.getRight();
-      if ((i == blockSize + 1 || i == blockSize + 2) && (j == blockSize + 1 || j == blockSize + 2)
-          || (i == blockSize + 1 || i == blockSize + 2) && (j == totalSize - 2 || j == totalSize - 3)
-          || (i == totalSize - 2 || i == totalSize - 3) && (j == blockSize + 1 || j == blockSize + 2)
-          || (i == totalSize - 2 || i == totalSize - 3) && (j == totalSize - 2 || j == totalSize - 3)) {
+      final var xz = gm.getGridXZ(chunkX, chunkZ);
+      final int gx = xz.getLeft();
+      final int gz = xz.getRight();
+      if ((gx == blockSize + 1 || gx == blockSize + 2) && (gz == blockSize + 1 || gz == blockSize + 2)
+          || (gx == blockSize + 1 || gx == blockSize + 2) && (gz == totalSize - 2 || gz == totalSize - 3)
+          || (gx == totalSize - 2 || gx == totalSize - 3) && (gz == blockSize + 1 || gz == blockSize + 2)
+          || (gx == totalSize - 2 || gx == totalSize - 3) && (gz == totalSize - 2 || gz == totalSize - 3)) {
         fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_7, LAYER_8);
         // TODO add side/corner ornamentations
       }

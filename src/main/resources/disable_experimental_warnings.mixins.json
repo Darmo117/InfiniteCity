@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.darmo_creations.infinitecity.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "MixinIntegratedServerLoader"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

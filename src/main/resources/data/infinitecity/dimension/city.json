@@ -1,0 +1,9 @@
+{
+  "type": "infinitecity:city",
+  "generator": {
+    "type": "infinitecity:city",
+    "settings": {
+      "biome": "infinitecity:city"
+    }
+  }
+}

@@ -106,7 +106,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     generateBuildingsLayer(chunk, mutable, chunkX, chunkZ);
     generateTopOfBuildingsLayer(chunk, mutable, chunkX, chunkZ);
     generateLayerWithHoles(chunk, mutable, chunkX, chunkZ);
-    generateBigBlocksLayer(chunk, mutable, chunkX, chunkZ, structureAccessor);
+    generateBigBlocksAndDesertLayer(chunk, mutable, chunkX, chunkZ, structureAccessor);
     return chunk;
   }
 
@@ -118,18 +118,22 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_2, LAYER_3);
   }
 
-  private static void generateBigBlocksLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {
-    if (LAYER_10_GRID_MANAGER.shouldBeFilled(chunkX, chunkZ))
-      fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_10, LAYER_11);
+  private static void generateBigBlocksAndDesertLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {
     int edgeTop = LAYER_11 + 8;
-    LAYER_10_GRID_MANAGER.isAtEdge(chunkX, chunkZ).ifPresent(d -> {
-      fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_11, edgeTop); // Block edge
-      generateDesertEgdePillars(chunk, mutable, chunkX, chunkZ, edgeTop);
-      generateBigBlocksInnerEdges(chunk, mutable, chunkX, chunkZ, edgeTop, d);
-    });
+    if (LAYER_10_GRID_MANAGER.shouldBeFilled(chunkX, chunkZ)) {
+      fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_10, LAYER_11);
+      var atEdge = LAYER_10_GRID_MANAGER.isAtEdge(chunkX, chunkZ);
+      if (atEdge.isPresent()) {
+        fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_11, edgeTop); // Block edge
+        generateDesertEgdePillars(chunk, mutable, chunkX, chunkZ, edgeTop);
+        generateBigBlocksInnerEdges(chunk, mutable, chunkX, chunkZ, edgeTop, atEdge.get());
+      } else {
+        generateDunes(chunk, mutable, chunkX, chunkZ, structureAccessor);
+        erodeDunesNearEdge(chunk, mutable, chunkX, chunkZ, edgeTop);
+      }
+    }
     LAYER_10_GRID_MANAGER.isPastEdge(chunkX, chunkZ)
         .ifPresent(d -> generateBigBlocksOuterEdges(chunk, mutable, chunkX, chunkZ, edgeTop, d));
-    generateDeserts(chunk, mutable, chunkX, chunkZ, edgeTop, structureAccessor);
   }
 
   private static void generateDesertEgdePillars(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int edgeTop) {
@@ -266,14 +270,6 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     }
   }
 
-  private static void generateDeserts(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int edgeTop, StructureAccessor structureAccessor) {
-    if (LAYER_10_GRID_MANAGER.shouldBeFilled(chunkX, chunkZ)
-        && LAYER_10_GRID_MANAGER.isAtEdge(chunkX, chunkZ).isEmpty()) {
-      generateDunes(chunk, mutable, chunkX, chunkZ, structureAccessor);
-      erodeDunesNearEdge(chunk, mutable, chunkX, chunkZ, edgeTop);
-    }
-  }
-
   private static void generateDunes(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {
     final DoublePerlinNoiseSampler sampler =
         DoublePerlinNoiseSampler.create(getRandom(structureAccessor), -6, 1.0, 0.5);
@@ -310,8 +306,9 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   private static void generateBuildingsLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ) {
     if (LAYER_6_GRID_MANAGER.shouldBeFilled(chunkX, chunkZ)) {
       fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_6, LAYER_7);
+      LAYER_6_GRID_MANAGER.isAtEdge(chunkX, chunkZ).ifPresent(d -> {
+      });
     }
-    // TODO Generate facades
   }
 
   private static void generateTopOfBuildingsLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ) {
@@ -327,6 +324,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
           || (i == totalSize - 2 || i == totalSize - 3) && (j == blockSize + 1 || j == blockSize + 2)
           || (i == totalSize - 2 || i == totalSize - 3) && (j == totalSize - 2 || j == totalSize - 3)) {
         fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_7, LAYER_8);
+        // TODO add side/corner ornamentations
       }
     }
   }

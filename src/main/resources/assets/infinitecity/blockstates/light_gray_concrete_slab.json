@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "infinitecity:block/light_gray_concrete_slab_bottom"
+    },
+    "type=top": {
+      "model": "infinitecity:block/light_gray_concrete_slab_top"
+    },
+    "type=double": {
+      "model": "minecraft:block/light_gray_concrete"
+    }
+  }
+}

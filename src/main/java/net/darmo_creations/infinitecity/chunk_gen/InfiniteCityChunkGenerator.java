@@ -2,6 +2,7 @@ package net.darmo_creations.infinitecity.chunk_gen;
 
 import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.*;
+import net.darmo_creations.infinitecity.blocks.*;
 import net.darmo_creations.infinitecity.mixins.*;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.*;
@@ -68,7 +69,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   private static final BlockState TERRAIN = Blocks.LIGHT_GRAY_CONCRETE.getDefaultState();
   private static final BlockState SAND = Blocks.SAND.getDefaultState();
 
-  private static final BlockState STAIRS_BASE = Blocks.POLISHED_ANDESITE_STAIRS.getDefaultState(); // TODO custom stairs
+  private static final BlockState STAIRS_BASE = ModBlocks.LIGHT_GRAY_CONCRETE_STAIRS.getDefaultState();
   private static final BlockState STAIRS_SOUTH = STAIRS_BASE.with(StairsBlock.FACING, Direction.SOUTH);
   private static final BlockState STAIRS_SOUTH_TOP = STAIRS_SOUTH.with(StairsBlock.HALF, BlockHalf.TOP);
   private static final BlockState STAIRS_NORTH = STAIRS_BASE.with(StairsBlock.FACING, Direction.NORTH);

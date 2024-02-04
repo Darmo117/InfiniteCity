@@ -1,0 +1,25 @@
+{
+  "variants": {
+    "type=north": {
+      "model": "infinitecity:block/light_gray_concrete_vertical_slab"
+    },
+    "type=south": {
+      "model": "infinitecity:block/light_gray_concrete_vertical_slab",
+      "y": 180,
+      "uvlock": true
+    },
+    "type=west": {
+      "model": "infinitecity:block/light_gray_concrete_vertical_slab",
+      "y": 270,
+      "uvlock": true
+    },
+    "type=east": {
+      "model": "infinitecity:block/light_gray_concrete_vertical_slab",
+      "y": 90,
+      "uvlock": true
+    },
+    "type=double": {
+      "model": "minecraft:block/light_gray_concrete"
+    }
+  }
+}

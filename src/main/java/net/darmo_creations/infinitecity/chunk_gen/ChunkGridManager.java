@@ -167,6 +167,11 @@ public class ChunkGridManager {
       return this.horizontalDirections.contains(direction);
     }
 
+    public boolean faces(Direction.AxisDirection axisDirection) {
+      return this.horizontalDirections.stream()
+          .anyMatch(d -> d.getDirection() == axisDirection);
+    }
+
     public static HoleDirection forAxisAndDirection(Direction.Axis axis, Direction.AxisDirection direction) {
       return switch (axis) {
         case X -> direction == Direction.AxisDirection.POSITIVE ? EAST : WEST;

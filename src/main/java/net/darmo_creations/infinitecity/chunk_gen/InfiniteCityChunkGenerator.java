@@ -59,7 +59,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   private static final int LAYER_6 = LAYER_5 + 200; // On-grid blocks with windowed facades
   private static final int LAYER_7 = LAYER_6 + 401; // Empty space with structures, hanging walkways and columns around holes of next layer
   private static final int LAYER_8 = LAYER_7 + 128; // Plain layer with on-grid square holes
-  private static final int LAYER_9 = LAYER_8 + 400; // Empty space with structures hanging below next layer
+  private static final int LAYER_9 = LAYER_8 + 412; // Empty space with structures hanging below next layer
   private static final int LAYER_10 = LAYER_9 + 100; // On-grid blocks
   private static final int LAYER_11 = LAYER_10 + 200; // Empty space with desert landscapes atop blocks of previous layer
   private static final int TOP = 2032; // Max allowed value
@@ -483,82 +483,59 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     if (LAYER_8_GRID_MANAGERS.stream().allMatch(gm -> gm.shouldBeFilled(chunkX, chunkZ)))
       fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_8, LAYER_9);
     for (ChunkGridManager chunkGridManager : LAYER_8_GRID_MANAGERS) {
-      chunkGridManager.isAtEdge(chunkX, chunkZ).ifPresent(d -> {
-        fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_9, LAYER_9 + 2);
-        generateHoleOuterEdges(chunk, mutable, chunkX, chunkZ, d);
-      });
       chunkGridManager.isPastEdge(chunkX, chunkZ)
-          .ifPresent(d -> generateHoleInnerEdges(chunk, mutable, chunkX, chunkZ, d));
+          .ifPresent(d -> generateHoleInnerRings(chunk, mutable, chunkX, chunkZ, d));
     }
   }
 
-  private static void generateHoleInnerEdges(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, ChunkGridManager.HoleDirection holeDirection) {
-    final int bottomY = LAYER_9;
-    final int topY = LAYER_9 + 4;
-    switch (holeDirection) {
-      case SOUTH -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
+  private static void generateHoleInnerRings(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, ChunkGridManager.HoleDirection holeDirection) {
+    final int width = 5;
+    final int height = 8;
+    final int cornerWidth = 7;
+    for (int y = LAYER_8 - 1; y < LAYER_9; y += 50 + height) {
+      final int from, to, edge;
+      BlockState bottomStairs, topStairs;
+      if (holeDirection.faces(Direction.AxisDirection.NEGATIVE)) {
+        from = edge = 16 - width;
+        to = 16;
+      } else {
+        from = 0;
+        to = width;
+        edge = width - 1;
       }
-      case NORTH -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
+      if (holeDirection.faces(Direction.NORTH) || holeDirection.faces(Direction.SOUTH)) {
+        if (holeDirection.faces(Direction.NORTH)) {
+          bottomStairs = STAIRS_SOUTH;
+          topStairs = STAIRS_SOUTH_TOP;
+        } else {
+          bottomStairs = STAIRS_NORTH;
+          topStairs = STAIRS_NORTH_TOP;
+        }
+        fill(chunk, mutable, chunkX, chunkZ, 0, 16, from, to, y, y + height, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 16, edge, edge + 1, y + height - 1, y + height, bottomStairs);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 16, edge, edge + 1, y, y + 1, topStairs);
       }
-      case EAST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
+      if (holeDirection.faces(Direction.WEST) || holeDirection.faces(Direction.EAST)) {
+        if (holeDirection.faces(Direction.WEST)) {
+          bottomStairs = STAIRS_EAST;
+          topStairs = STAIRS_EAST_TOP;
+        } else {
+          bottomStairs = STAIRS_WEST;
+          topStairs = STAIRS_WEST_TOP;
+        }
+        fill(chunk, mutable, chunkX, chunkZ, from, to, 0, 16, y, y + height, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, edge, edge + 1, 0, 16, y + height - 1, y + height, bottomStairs);
+        fill(chunk, mutable, chunkX, chunkZ, edge, edge + 1, 0, 16, y, y + 1, topStairs);
       }
-      case WEST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
+      if (holeDirection == ChunkGridManager.HoleDirection.SOUTH_EAST) {
+        fill(chunk, mutable, chunkX, chunkZ, 0, cornerWidth, 0, cornerWidth, y, y + height, TERRAIN);
+      } else if (holeDirection == ChunkGridManager.HoleDirection.SOUTH_WEST) {
+        fill(chunk, mutable, chunkX, chunkZ, 16 - cornerWidth, 16, 0, cornerWidth, y, y + height, TERRAIN);
+      } else if (holeDirection == ChunkGridManager.HoleDirection.NORTH_WEST) {
+        fill(chunk, mutable, chunkX, chunkZ, 16 - cornerWidth, 16, 16 - cornerWidth, 16, y, y + height, TERRAIN);
+      } else if (holeDirection == ChunkGridManager.HoleDirection.NORTH_EAST) {
+        fill(chunk, mutable, chunkX, chunkZ, 0, cornerWidth, 16 - cornerWidth, 16, y, y + height, TERRAIN);
       }
-      case SOUTH_EAST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
-      }
-      case SOUTH_WEST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
-      }
-      case NORTH_EAST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
-      }
-      case NORTH_WEST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
-      }
-    }
-  }
-
-  private static void generateHoleOuterEdges(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, ChunkGridManager.HoleDirection holeDirection) {
-    final int bottomY = LAYER_9 + 2;
-    final int topY = LAYER_9 + 4;
-    switch (holeDirection) {
-      case SOUTH -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
-      }
-      case NORTH -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
-      }
-      case EAST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
-      }
-      case WEST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
-      }
-      case SOUTH_EAST -> fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
-      case SOUTH_WEST -> fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
-      case NORTH_EAST -> fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
-      case NORTH_WEST -> fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
     }
   }
 

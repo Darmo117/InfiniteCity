@@ -117,7 +117,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   }
 
   private static Chunk populateNoise(Chunk chunk, StructureAccessor structureAccessor) {
-    final BlockPos.Mutable mutable = new BlockPos.Mutable();
+    final var mutable = new BlockPos.Mutable();
     final ChunkPos chunkPos = chunk.getPos();
     final int chunkX = chunkPos.x;
     final int chunkZ = chunkPos.z;
@@ -291,8 +291,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   }
 
   private static void generateDunes(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {
-    final DoublePerlinNoiseSampler sampler =
-        DoublePerlinNoiseSampler.create(getRandom(structureAccessor), -6, 1.0, 0.5);
+    final var sampler = DoublePerlinNoiseSampler.create(getRandom(structureAccessor), -6, 1.0, 0.5);
     for (int dx = 0; dx < 16; dx++) {
       final int x = getHPos(chunkX, dx);
       for (int dz = 0; dz < 16; dz++) {
@@ -339,8 +338,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
 
   @SuppressWarnings("SameParameterValue")
   private static void generateBuildingFacade(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, ChunkGridManager.HoleDirection holeDirection, int edgeHeight, StructureAccessor structureAccessor) {
-    final DoublePerlinNoiseSampler sampler =
-        DoublePerlinNoiseSampler.create(getRandom(structureAccessor), 0, 1.0);
+    final var sampler = DoublePerlinNoiseSampler.create(getRandom(structureAccessor), 0, 1.0);
     final int topY = LAYER_7 - edgeHeight;
     final int bottomY = LAYER_6 + edgeHeight;
     final Function<Double, BlockState> getBlockState = sample -> sample > 0.25 ? LIGHT_BLOCK : BLACK;
@@ -463,7 +461,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
 
   private static void generateTopOfBuildingsLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ) {
     // Build columns around holes of layer above
-    for (ChunkGridManager gm : LAYER_8_GRID_MANAGERS) {
+    for (var gm : LAYER_8_GRID_MANAGERS) {
       final int blockSize = gm.getBlockSize();
       final int totalSize = blockSize + gm.getBlockSpacing();
       final var xz = gm.getGridXZ(chunkX, chunkZ);
@@ -482,7 +480,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   private static void generateLayerWithHoles(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ) {
     if (LAYER_8_GRID_MANAGERS.stream().allMatch(gm -> gm.shouldBeFilled(chunkX, chunkZ)))
       fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_8, LAYER_9);
-    for (ChunkGridManager chunkGridManager : LAYER_8_GRID_MANAGERS) {
+    for (var chunkGridManager : LAYER_8_GRID_MANAGERS) {
       chunkGridManager.isPastEdge(chunkX, chunkZ)
           .ifPresent(d -> generateHoleInnerRings(chunk, mutable, chunkX, chunkZ, d));
     }
@@ -572,7 +570,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
    */
   @Override
   public void buildSurface(ChunkRegion region, StructureAccessor structureAccessor, NoiseConfig noiseConfig, Chunk chunk) {
-    final BlockPos.Mutable mutable = new BlockPos.Mutable();
+    final var mutable = new BlockPos.Mutable();
     final ChunkPos chunkPos = chunk.getPos();
     final int chunkX = chunkPos.x;
     final int chunkZ = chunkPos.z;
@@ -581,8 +579,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   }
 
   private static void generateBaseLayerElevation(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {
-    final DoublePerlinNoiseSampler sampler =
-        DoublePerlinNoiseSampler.create(getRandom(structureAccessor), 0, 1.0);
+    final var sampler = DoublePerlinNoiseSampler.create(getRandom(structureAccessor), 0, 1.0);
     final int precision = 8;
     for (int dx = 0; dx < 16; dx += precision) {
       final int x = getHPos(chunkX, dx);

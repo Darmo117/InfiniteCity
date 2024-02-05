@@ -54,9 +54,9 @@ public class ChunkGridManager {
 
   public Optional<HoleDirection> isAtEdge(int chunkX, int chunkZ) {
     if (this.inverted) {
-      final Optional<Direction.AxisDirection> pastX = this.isPastBlockEdge(chunkX, this.offsetX)
+      final var pastX = this.isPastBlockEdge(chunkX, this.offsetX)
           .map(Direction.AxisDirection::getOpposite);
-      final Optional<Direction.AxisDirection> pastZ = this.isPastBlockEdge(chunkZ, this.offsetZ)
+      final var pastZ = this.isPastBlockEdge(chunkZ, this.offsetZ)
           .map(Direction.AxisDirection::getOpposite);
 
       if (pastX.isPresent() && pastZ.isPresent())
@@ -67,8 +67,8 @@ public class ChunkGridManager {
         return pastZ.map(d -> HoleDirection.forAxisAndDirection(Direction.Axis.Z, d));
 
     } else {
-      final Optional<Direction.AxisDirection> edgeX = this.isAtBlockEdge(chunkX, this.offsetX);
-      final Optional<Direction.AxisDirection> edgeZ = this.isAtBlockEdge(chunkZ, this.offsetZ);
+      final var edgeX = this.isAtBlockEdge(chunkX, this.offsetX);
+      final var edgeZ = this.isAtBlockEdge(chunkZ, this.offsetZ);
 
       if (edgeX.isPresent() && edgeZ.isPresent())
         return Optional.of(HoleDirection.forDirections(edgeX.get(), edgeZ.get()));
@@ -83,9 +83,9 @@ public class ChunkGridManager {
 
   public Optional<HoleDirection> isPastEdge(int chunkX, int chunkZ) {
     if (this.inverted) {
-      final Optional<Direction.AxisDirection> edgeX = this.isAtBlockEdge(chunkX, this.offsetX)
+      final var edgeX = this.isAtBlockEdge(chunkX, this.offsetX)
           .map(Direction.AxisDirection::getOpposite);
-      final Optional<Direction.AxisDirection> edgeZ = this.isAtBlockEdge(chunkZ, this.offsetZ)
+      final var edgeZ = this.isAtBlockEdge(chunkZ, this.offsetZ)
           .map(Direction.AxisDirection::getOpposite);
 
       if (edgeX.isPresent() && edgeZ.isPresent())
@@ -96,8 +96,8 @@ public class ChunkGridManager {
         return edgeZ.map(d -> HoleDirection.forAxisAndDirection(Direction.Axis.Z, d));
 
     } else {
-      final Optional<Direction.AxisDirection> pastX = this.isPastBlockEdge(chunkX, this.offsetX);
-      final Optional<Direction.AxisDirection> pastZ = this.isPastBlockEdge(chunkZ, this.offsetZ);
+      final var pastX = this.isPastBlockEdge(chunkX, this.offsetX);
+      final var pastZ = this.isPastBlockEdge(chunkZ, this.offsetZ);
 
       if (pastX.isPresent() && pastZ.isPresent())
         return Optional.of(HoleDirection.forDirections(pastX.get(), pastZ.get()));

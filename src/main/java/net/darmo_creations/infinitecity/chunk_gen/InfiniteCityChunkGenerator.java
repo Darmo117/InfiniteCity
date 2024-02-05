@@ -493,39 +493,43 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     final int height = 8;
     final int cornerWidth = 7;
     for (int y = LAYER_8 - 1; y < LAYER_9; y += 50 + height) {
-      final int from, to, edge;
-      BlockState bottomStairs, topStairs;
-      if (holeDirection.faces(Direction.AxisDirection.NEGATIVE)) {
-        from = edge = 16 - width;
-        to = 16;
-      } else {
-        from = 0;
-        to = width;
-        edge = width - 1;
-      }
       if (holeDirection.faces(Direction.NORTH) || holeDirection.faces(Direction.SOUTH)) {
+        BlockState bottomStairs, topStairs;
+        final int fromZ, toZ, edgeZ;
         if (holeDirection.faces(Direction.NORTH)) {
+          fromZ = edgeZ = 16 - width;
+          toZ = 16;
           bottomStairs = STAIRS_SOUTH;
           topStairs = STAIRS_SOUTH_TOP;
         } else {
+          fromZ = 0;
+          toZ = width;
+          edgeZ = width - 1;
           bottomStairs = STAIRS_NORTH;
           topStairs = STAIRS_NORTH_TOP;
         }
-        fill(chunk, mutable, chunkX, chunkZ, 0, 16, from, to, y, y + height, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 16, edge, edge + 1, y + height - 1, y + height, bottomStairs);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 16, edge, edge + 1, y, y + 1, topStairs);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 16, fromZ, toZ, y, y + height, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 16, edgeZ, edgeZ + 1, y + height - 1, y + height, bottomStairs);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 16, edgeZ, edgeZ + 1, y, y + 1, topStairs);
       }
       if (holeDirection.faces(Direction.WEST) || holeDirection.faces(Direction.EAST)) {
+        final int fromX, toX, edgeX;
+        BlockState bottomStairs, topStairs;
         if (holeDirection.faces(Direction.WEST)) {
+          fromX = edgeX = 16 - width;
+          toX = 16;
           bottomStairs = STAIRS_EAST;
           topStairs = STAIRS_EAST_TOP;
         } else {
+          fromX = 0;
+          toX = width;
+          edgeX = width - 1;
           bottomStairs = STAIRS_WEST;
           topStairs = STAIRS_WEST_TOP;
         }
-        fill(chunk, mutable, chunkX, chunkZ, from, to, 0, 16, y, y + height, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, edge, edge + 1, 0, 16, y + height - 1, y + height, bottomStairs);
-        fill(chunk, mutable, chunkX, chunkZ, edge, edge + 1, 0, 16, y, y + 1, topStairs);
+        fill(chunk, mutable, chunkX, chunkZ, fromX, toX, 0, 16, y, y + height, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, edgeX, edgeX + 1, 0, 16, y + height - 1, y + height, bottomStairs);
+        fill(chunk, mutable, chunkX, chunkZ, edgeX, edgeX + 1, 0, 16, y, y + 1, topStairs);
       }
       if (holeDirection == ChunkGridManager.HoleDirection.SOUTH_EAST) {
         fill(chunk, mutable, chunkX, chunkZ, 0, cornerWidth, 0, cornerWidth, y, y + height, TERRAIN);

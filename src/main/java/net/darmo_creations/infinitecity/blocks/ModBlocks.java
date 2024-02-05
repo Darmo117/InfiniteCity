@@ -25,6 +25,10 @@ public final class ModBlocks {
       "light_gray_concrete_vertical_slab",
       new VerticalSlabBlock(Blocks.LIGHT_GRAY_CONCRETE.getSettings())
   );
+  public static final WallBlock LIGHT_GRAY_CONCRETE_WALL = register(
+      "light_gray_concrete_wall",
+      new WallBlock(Blocks.LIGHT_GRAY_CONCRETE.getSettings())
+  );
   public static final Block[] LIGHT_BLOCKS = new Block[15];
 
   static {
@@ -47,7 +51,7 @@ public final class ModBlocks {
    * @param <T>   Type of the block to register.
    * @return The registered block.
    */
-  private static <T extends Block> T register(final String name, final T block) {
+  private static <T extends Block> T register(String name, final T block) {
     Registry.register(Registries.BLOCK, new Identifier(InfiniteCity.MOD_ID, name), block);
     Item.Settings settings = new FabricItemSettings();
     if (block instanceof OperatorBlock) {
@@ -68,6 +72,7 @@ public final class ModBlocks {
       content.addAfter(Items.LIGHT_GRAY_CONCRETE, LIGHT_GRAY_CONCRETE_STAIRS.asItem());
       content.addAfter(LIGHT_GRAY_CONCRETE_STAIRS, LIGHT_GRAY_CONCRETE_SLAB.asItem());
       content.addAfter(LIGHT_GRAY_CONCRETE_SLAB, LIGHT_GRAY_CONCRETE_VSLAB.asItem());
+      content.addAfter(LIGHT_GRAY_CONCRETE_VSLAB, LIGHT_GRAY_CONCRETE_WALL.asItem());
     });
     ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {
       Item prev = Items.PEARLESCENT_FROGLIGHT;

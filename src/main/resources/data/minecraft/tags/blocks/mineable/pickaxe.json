@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "infinitecity:light_gray_concrete_slab",
+    "infinitecity:light_gray_concrete_vertical_slab",
+    "infinitecity:light_gray_concrete_stairs"
+  ]
+}

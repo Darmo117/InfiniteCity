@@ -4,8 +4,6 @@
   "package": "net.darmo_creations.infinitecity.mixins",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "ChunkNoiseSamplerInvoker",
-    "DensityFunctionsInvoker",
     "StructureAccessorAccessor"
   ],
   "injectors": {

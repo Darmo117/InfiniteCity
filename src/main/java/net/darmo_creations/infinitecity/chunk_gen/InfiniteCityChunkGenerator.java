@@ -360,7 +360,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
           final int x = holeDirection.faces(Direction.WEST) ? 0 : 15;
           setBlock(chunk, mutable, chunkX, chunkZ, x, d, y - 2, GLASS_PANE_Z);
           setBlock(chunk, mutable, chunkX, chunkZ, x, d, y - 3, GLASS_PANE_Z);
-          final int x1 = x + (holeDirection.faces(Direction.NORTH) ? 1 : -1);
+          final int x1 = x + (holeDirection.faces(Direction.WEST) ? 1 : -1);
           final double sample = sampler.sample(x1, y, getHPos(chunkZ, d));
           final BlockState blockState = getBlockState.apply(sample);
           setBlock(chunk, mutable, chunkX, chunkZ, x1, d, y - 2, blockState);

@@ -51,13 +51,13 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
           .apply(instance, instance.stable(InfiniteCityChunkGenerator::new))
   );
 
-  private static final int LAYER_1 = 0; // Bedrock
+  private static final int LAYER_1 = -2032; // Bedrock
   private static final int LAYER_2 = LAYER_1 + 1; // Thin terrain layer
   private static final int LAYER_3 = LAYER_2 + 1; // Empty space with columns, bridges, arches, etc.
-  private static final int LAYER_4 = 200; // ?
+  private static final int LAYER_4 = LAYER_3 + 200; // ?
   private static final int LAYER_5 = LAYER_4 + 200; // ?
   private static final int LAYER_6 = LAYER_5 + 200; // On-grid blocks with windowed facades
-  private static final int LAYER_7 = LAYER_6 + 200; // Empty space with structures, hanging walkways and columns around holes of next layer
+  private static final int LAYER_7 = LAYER_6 + 401; // Empty space with structures, hanging walkways and columns around holes of next layer
   private static final int LAYER_8 = LAYER_7 + 128; // Plain layer with on-grid square holes
   private static final int LAYER_9 = LAYER_8 + 400; // Empty space with structures hanging below next layer
   private static final int LAYER_10 = LAYER_9 + 100; // On-grid blocks

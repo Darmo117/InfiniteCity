@@ -59,8 +59,8 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   private static final int LAYER_6 = LAYER_5 + 200; // On-grid blocks with windowed facades
   private static final int LAYER_7 = LAYER_6 + 401; // Empty space with structures, hanging walkways and columns around holes of next layer
   private static final int LAYER_8 = LAYER_7 + 128; // Plain layer with on-grid square holes
-  private static final int LAYER_9 = LAYER_8 + 412; // Empty space with structures hanging below next layer
-  private static final int LAYER_10 = LAYER_9 + 100; // On-grid blocks
+  private static final int LAYER_9 = LAYER_8 + 412; // Empty space with ?
+  private static final int LAYER_10 = LAYER_9 + 128; // On-grid blocks
   private static final int LAYER_11 = LAYER_10 + 200; // Empty space with desert landscapes atop blocks of previous layer
   private static final int TOP = 2032; // Max allowed value
   private static final int WORLD_HEIGHT = TOP - LAYER_1;
@@ -124,8 +124,9 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     generateBedrockLayer(chunk, mutable, chunkX, chunkZ);
     generateBottomLayer(chunk, mutable, chunkX, chunkZ);
     generateBuildingsLayer(chunk, mutable, chunkX, chunkZ, structureAccessor);
-    generateTopOfBuildingsLayer(chunk, mutable, chunkX, chunkZ);
+    generateColumnsAroundHoles(chunk, mutable, chunkX, chunkZ, LAYER_7, LAYER_8);
     generateLayerWithHoles(chunk, mutable, chunkX, chunkZ);
+    generateColumnsAroundHoles(chunk, mutable, chunkX, chunkZ, LAYER_9, LAYER_10);
     generateBigBlocksAndDesertLayer(chunk, mutable, chunkX, chunkZ, structureAccessor);
     return chunk;
   }
@@ -459,8 +460,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     }
   }
 
-  private static void generateTopOfBuildingsLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ) {
-    // Build columns around holes of layer above
+  private static void generateColumnsAroundHoles(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int bottomY, int topY) {
     for (var gm : LAYER_8_GRID_MANAGERS) {
       final int blockSize = gm.getBlockSize();
       final int totalSize = blockSize + gm.getBlockSpacing();
@@ -471,7 +471,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
           || (gx == blockSize + 1 || gx == blockSize + 2) && (gz == totalSize - 2 || gz == totalSize - 3)
           || (gx == totalSize - 2 || gx == totalSize - 3) && (gz == blockSize + 1 || gz == blockSize + 2)
           || (gx == totalSize - 2 || gx == totalSize - 3) && (gz == totalSize - 2 || gz == totalSize - 3)) {
-        fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_7, LAYER_8);
+        fillChunkTerrain(chunk, mutable, chunkX, chunkZ, bottomY, topY);
         // TODO add side/corner ornamentations
       }
     }

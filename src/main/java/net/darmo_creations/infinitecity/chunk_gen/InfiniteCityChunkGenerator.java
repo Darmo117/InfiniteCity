@@ -492,72 +492,72 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   }
 
   private static void generateHoleInnerEdges(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, ChunkGridManager.HoleDirection holeDirection) {
-    final int y1 = LAYER_9;
-    final int y2 = LAYER_9 + 4;
+    final int bottomY = LAYER_9;
+    final int topY = LAYER_9 + 4;
     switch (holeDirection) {
       case SOUTH -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, y1, y2, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
       }
       case NORTH -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, y1, y2, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
       }
       case EAST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, y1, y2, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
       }
       case WEST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, y1, y2, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
       }
       case SOUTH_EAST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, y1, y2, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
       }
       case SOUTH_WEST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, y1, y2, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
       }
       case NORTH_EAST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, y1, y2, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
       }
       case NORTH_WEST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, y1, y2, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
       }
     }
   }
 
   private static void generateHoleOuterEdges(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, ChunkGridManager.HoleDirection holeDirection) {
-    final int y1 = LAYER_9 + 2;
-    final int y2 = LAYER_9 + 4;
+    final int bottomY = LAYER_9 + 2;
+    final int topY = LAYER_9 + 4;
     switch (holeDirection) {
       case SOUTH -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, y1, y2, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
       }
       case NORTH -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, y1, y2, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
       }
       case EAST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, y1, y2, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
       }
       case WEST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, y1, y2, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, y1, y2, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
       }
-      case SOUTH_EAST -> fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, y1, y2, TERRAIN);
-      case SOUTH_WEST -> fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, y1, y2, TERRAIN);
-      case NORTH_EAST -> fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, y1, y2, TERRAIN);
-      case NORTH_WEST -> fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, y1, y2, TERRAIN);
+      case SOUTH_EAST -> fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, bottomY, topY, TERRAIN);
+      case SOUTH_WEST -> fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, bottomY, topY, TERRAIN);
+      case NORTH_EAST -> fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, bottomY, topY, TERRAIN);
+      case NORTH_WEST -> fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, bottomY, topY, TERRAIN);
     }
   }
 

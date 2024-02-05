@@ -25,6 +25,19 @@ public final class ModBlocks {
       "light_gray_concrete_vertical_slab",
       new VerticalSlabBlock(Blocks.LIGHT_GRAY_CONCRETE.getSettings())
   );
+  public static final Block[] LIGHT_BLOCKS = new Block[15];
+
+  static {
+    for (int i = 1; i < 16; i++) {
+      final int luminance = i; // Required by the lambda
+      LIGHT_BLOCKS[i - 1] = register(
+          "light_block_" + i,
+          new Block(Blocks.LIGHT_GRAY_CONCRETE.getSettings()
+              .mapColor(MapColor.WHITE)
+              .luminance(value -> luminance))
+      );
+    }
+  }
 
   /**
    * Registers a block and its item, and puts it in the given item group.
@@ -55,6 +68,13 @@ public final class ModBlocks {
       content.addAfter(Items.LIGHT_GRAY_CONCRETE, LIGHT_GRAY_CONCRETE_STAIRS.asItem());
       content.addAfter(LIGHT_GRAY_CONCRETE_STAIRS, LIGHT_GRAY_CONCRETE_SLAB.asItem());
       content.addAfter(LIGHT_GRAY_CONCRETE_SLAB, LIGHT_GRAY_CONCRETE_VSLAB.asItem());
+    });
+    ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {
+      Item prev = Items.PEARLESCENT_FROGLIGHT;
+      for (Block lightBlock : LIGHT_BLOCKS) {
+        content.addAfter(prev, lightBlock);
+        prev = lightBlock.asItem();
+      }
     });
   }
 

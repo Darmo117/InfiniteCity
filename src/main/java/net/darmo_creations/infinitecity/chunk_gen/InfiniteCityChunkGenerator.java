@@ -19,6 +19,7 @@ import net.minecraft.world.gen.noise.*;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.*;
 
 /**
  * Notations:
@@ -67,6 +68,11 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   private static final BlockState AIR = Blocks.AIR.getDefaultState();
   private static final BlockState BEDROCK = Blocks.BEDROCK.getDefaultState();
   private static final BlockState TERRAIN = Blocks.LIGHT_GRAY_CONCRETE.getDefaultState();
+  private static final BlockState BLACK = Blocks.BLACK_CONCRETE.getDefaultState();
+  private static final BlockState LIGHT_BLOCK = ModBlocks.LIGHT_BLOCKS[14].getDefaultState();
+  private static final BlockState GLASS_PANE = Blocks.LIGHT_GRAY_STAINED_GLASS_PANE.getDefaultState();
+  private static final BlockState GLASS_PANE_X = GLASS_PANE.with(PaneBlock.WEST, true).with(PaneBlock.EAST, true);
+  private static final BlockState GLASS_PANE_Z = GLASS_PANE.with(PaneBlock.NORTH, true).with(PaneBlock.SOUTH, true);
   private static final BlockState SAND = Blocks.SAND.getDefaultState();
 
   private static final BlockState STAIRS_BASE = ModBlocks.LIGHT_GRAY_CONCRETE_STAIRS.getDefaultState();
@@ -116,7 +122,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     final int chunkZ = chunkPos.z;
     generateBedrockLayer(chunk, mutable, chunkX, chunkZ);
     generateBottomLayer(chunk, mutable, chunkX, chunkZ);
-    generateBuildingsLayer(chunk, mutable, chunkX, chunkZ);
+    generateBuildingsLayer(chunk, mutable, chunkX, chunkZ, structureAccessor);
     generateTopOfBuildingsLayer(chunk, mutable, chunkX, chunkZ);
     generateLayerWithHoles(chunk, mutable, chunkX, chunkZ);
     generateBigBlocksAndDesertLayer(chunk, mutable, chunkX, chunkZ, structureAccessor);
@@ -316,121 +322,139 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     }
   }
 
-  private static void generateBuildingsLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ) {
+  private static void generateBuildingsLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {
     final int edgeHeight = 8;
     if (LAYER_6_GRID_MANAGER.shouldBeFilled(chunkX, chunkZ)) {
       fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_6, LAYER_7);
       LAYER_6_GRID_MANAGER.isAtEdge(chunkX, chunkZ).ifPresent(
-          d -> generateBuildingFacade(chunk, mutable, chunkX, chunkZ, d, edgeHeight));
+          d -> generateBuildingFacade(chunk, mutable, chunkX, chunkZ, d, edgeHeight, structureAccessor));
     } else {
-      LAYER_6_GRID_MANAGER.isPastEdge(chunkX, chunkZ).ifPresent(
-          d -> generateBuildingFacadeEdge(chunk, mutable, chunkX, chunkZ, d, edgeHeight));
+      LAYER_6_GRID_MANAGER.isPastEdge(chunkX, chunkZ).ifPresent(d -> {
+        generateBuildingFacadeEdge(chunk, mutable, chunkX, chunkZ, d, edgeHeight, true);
+        generateBuildingFacadeEdge(chunk, mutable, chunkX, chunkZ, d, edgeHeight, false);
+      });
     }
   }
 
-  private static void generateBuildingFacade(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, ChunkGridManager.HoleDirection holeDirection, int edgeHeight) {
-    switch (holeDirection) {
-      case NORTH -> {
-      }
-      case SOUTH -> {
-      }
-      case WEST -> {
-      }
-      case EAST -> {
-      }
-      case NORTH_WEST -> {
-      }
-      case NORTH_EAST -> {
-      }
-      case SOUTH_WEST -> {
-      }
-      case SOUTH_EAST -> {
+  @SuppressWarnings("SameParameterValue")
+  private static void generateBuildingFacade(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, ChunkGridManager.HoleDirection holeDirection, int edgeHeight, StructureAccessor structureAccessor) {
+    final DoublePerlinNoiseSampler sampler =
+        DoublePerlinNoiseSampler.create(getRandom(structureAccessor), 0, 1.0);
+    final int topY = LAYER_7 - edgeHeight;
+    final int bottomY = LAYER_6 + edgeHeight;
+    final Function<Double, BlockState> getBlockState = sample -> sample > 0.25 ? LIGHT_BLOCK : BLACK;
+    // TODO generate features in gaps
+    for (int y = topY; y - 3 > bottomY; y -= 3) {
+      for (int d = 1; d < 15; d += 2) {
+        if (holeDirection.faces(Direction.NORTH) || holeDirection.faces(Direction.SOUTH)) {
+          final int z = holeDirection.faces(Direction.NORTH) ? 0 : 15;
+          setBlock(chunk, mutable, chunkX, chunkZ, d, z, y - 2, GLASS_PANE_X);
+          setBlock(chunk, mutable, chunkX, chunkZ, d, z, y - 3, GLASS_PANE_X);
+          final int z1 = z + (holeDirection.faces(Direction.NORTH) ? 1 : -1);
+          final double sample = sampler.sample(getHPos(chunkX, d), y, z1);
+          final BlockState blockState = getBlockState.apply(sample);
+          setBlock(chunk, mutable, chunkX, chunkZ, d, z1, y - 2, blockState);
+          setBlock(chunk, mutable, chunkX, chunkZ, d, z1, y - 3, blockState);
+        }
+        if (holeDirection.faces(Direction.WEST) || holeDirection.faces(Direction.EAST)) {
+          final int x = holeDirection.faces(Direction.WEST) ? 0 : 15;
+          setBlock(chunk, mutable, chunkX, chunkZ, x, d, y - 2, GLASS_PANE_Z);
+          setBlock(chunk, mutable, chunkX, chunkZ, x, d, y - 3, GLASS_PANE_Z);
+          final int x1 = x + (holeDirection.faces(Direction.NORTH) ? 1 : -1);
+          final double sample = sampler.sample(x1, y, getHPos(chunkZ, d));
+          final BlockState blockState = getBlockState.apply(sample);
+          setBlock(chunk, mutable, chunkX, chunkZ, x1, d, y - 2, blockState);
+          setBlock(chunk, mutable, chunkX, chunkZ, x1, d, y - 3, blockState);
+        }
+        if (d == 5) d += 3; // Leave 4-block empty space at middle
       }
     }
   }
 
-  private static void generateBuildingFacadeEdge(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, ChunkGridManager.HoleDirection holeDirection, int edgeHeight) {
-    final int edgeMinY = LAYER_7 - edgeHeight;
+  @SuppressWarnings("SameParameterValue")
+  private static void generateBuildingFacadeEdge(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, ChunkGridManager.HoleDirection holeDirection, int edgeHeight, boolean top) {
+    final int edgeMinY = top ? LAYER_7 - edgeHeight : LAYER_6;
+    final int edgeMaxY = top ? LAYER_7 : LAYER_6 + edgeHeight;
     final int width = 4;
     switch (holeDirection) {
       case NORTH -> {
         final int z0 = 16 - width;
-        fill(chunk, mutable, chunkX, chunkZ, 0, 16, z0, z0 + width, edgeMinY, LAYER_7, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 16, z0, z0 + 1, LAYER_7 - 1, LAYER_7, STAIRS_SOUTH);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 16, z0, z0 + width, edgeMinY, edgeMaxY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 16, z0, z0 + 1, edgeMaxY - 1, edgeMaxY, STAIRS_SOUTH);
         fill(chunk, mutable, chunkX, chunkZ, 0, 16, z0, z0 + 1, edgeMinY, edgeMinY + 1, STAIRS_SOUTH_TOP);
       }
       case SOUTH -> {
         final int z0 = width - 1;
-        fill(chunk, mutable, chunkX, chunkZ, 0, 16, 0, width, edgeMinY, LAYER_7, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 16, z0, z0 + 1, LAYER_7 - 1, LAYER_7, STAIRS_NORTH);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 16, 0, width, edgeMinY, edgeMaxY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, 16, z0, z0 + 1, edgeMaxY - 1, edgeMaxY, STAIRS_NORTH);
         fill(chunk, mutable, chunkX, chunkZ, 0, 16, z0, z0 + 1, edgeMinY, edgeMinY + 1, STAIRS_NORTH_TOP);
       }
       case WEST -> {
         final int x0 = 16 - width;
-        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + width, 0, 16, edgeMinY, LAYER_7, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, 0, 16, LAYER_7 - 1, LAYER_7, STAIRS_EAST);
+        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + width, 0, 16, edgeMinY, edgeMaxY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, 0, 16, edgeMaxY - 1, edgeMaxY, STAIRS_EAST);
         fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, 0, 16, edgeMinY, edgeMinY + 1, STAIRS_EAST_TOP);
       }
       case EAST -> {
         final int x0 = width - 1;
-        fill(chunk, mutable, chunkX, chunkZ, 0, width, 0, 16, edgeMinY, LAYER_7, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, 0, 16, LAYER_7 - 1, LAYER_7, STAIRS_WEST);
+        fill(chunk, mutable, chunkX, chunkZ, 0, width, 0, 16, edgeMinY, edgeMaxY, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, 0, 16, edgeMaxY - 1, edgeMaxY, STAIRS_WEST);
         fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, 0, 16, edgeMinY, edgeMinY + 1, STAIRS_WEST_TOP);
       }
       case NORTH_WEST -> {
         final int x0 = 16 - width;
         final int z0 = 16 - width;
-        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + width, z0, z0 + width, edgeMinY, LAYER_7, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + width, z0, z0 + width, edgeMinY, edgeMaxY, TERRAIN);
         // North
-        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + width, z0, z0 + 1, LAYER_7 - 1, LAYER_7, STAIRS_SOUTH);
+        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + width, z0, z0 + 1, edgeMaxY - 1, edgeMaxY, STAIRS_SOUTH);
         fill(chunk, mutable, chunkX, chunkZ, x0, x0 + width, z0, z0 + 1, edgeMinY, edgeMinY + 1, STAIRS_SOUTH_TOP);
         // West
-        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, z0, z0 + width, LAYER_7 - 1, LAYER_7, STAIRS_EAST);
+        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, z0, z0 + width, edgeMaxY - 1, edgeMaxY, STAIRS_EAST);
         fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, z0, z0 + width, edgeMinY, edgeMinY + 1, STAIRS_EAST_TOP);
         // Corner
-        setBlock(chunk, mutable, chunkX, chunkZ, x0, z0, LAYER_7 - 1, STAIRS_EAST.with(StairsBlock.SHAPE, StairShape.OUTER_RIGHT));
+        setBlock(chunk, mutable, chunkX, chunkZ, x0, z0, edgeMaxY - 1, STAIRS_EAST.with(StairsBlock.SHAPE, StairShape.OUTER_RIGHT));
         setBlock(chunk, mutable, chunkX, chunkZ, x0, z0, edgeMinY, STAIRS_EAST_TOP.with(StairsBlock.SHAPE, StairShape.OUTER_RIGHT));
       }
       case NORTH_EAST -> {
         final int x0 = width - 1;
         final int z0 = 16 - width;
-        fill(chunk, mutable, chunkX, chunkZ, 0, width, z0, z0 + width, edgeMinY, LAYER_7, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, width, z0, z0 + width, edgeMinY, edgeMaxY, TERRAIN);
         // North
-        fill(chunk, mutable, chunkX, chunkZ, 0, width, z0, z0 + 1, LAYER_7 - 1, LAYER_7, STAIRS_SOUTH);
+        fill(chunk, mutable, chunkX, chunkZ, 0, width, z0, z0 + 1, edgeMaxY - 1, edgeMaxY, STAIRS_SOUTH);
         fill(chunk, mutable, chunkX, chunkZ, 0, width, z0, z0 + 1, edgeMinY, edgeMinY + 1, STAIRS_SOUTH_TOP);
         // East
-        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, z0, z0 + width, LAYER_7 - 1, LAYER_7, STAIRS_WEST);
+        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, z0, z0 + width, edgeMaxY - 1, edgeMaxY, STAIRS_WEST);
         fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, z0, z0 + width, edgeMinY, edgeMinY + 1, STAIRS_WEST_TOP);
         // Corner
-        setBlock(chunk, mutable, chunkX, chunkZ, x0, z0, LAYER_7 - 1, STAIRS_WEST.with(StairsBlock.SHAPE, StairShape.OUTER_LEFT));
+        setBlock(chunk, mutable, chunkX, chunkZ, x0, z0, edgeMaxY - 1, STAIRS_WEST.with(StairsBlock.SHAPE, StairShape.OUTER_LEFT));
         setBlock(chunk, mutable, chunkX, chunkZ, x0, z0, edgeMinY, STAIRS_WEST_TOP.with(StairsBlock.SHAPE, StairShape.OUTER_LEFT));
       }
       case SOUTH_WEST -> {
         final int x0 = 16 - width;
         final int z0 = width - 1;
-        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + width, 0, width, edgeMinY, LAYER_7, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + width, 0, width, edgeMinY, edgeMaxY, TERRAIN);
         // South
-        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + width, z0, z0 + 1, LAYER_7 - 1, LAYER_7, STAIRS_NORTH);
+        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + width, z0, z0 + 1, edgeMaxY - 1, edgeMaxY, STAIRS_NORTH);
         fill(chunk, mutable, chunkX, chunkZ, x0, x0 + width, z0, z0 + 1, edgeMinY, edgeMinY + 1, STAIRS_NORTH_TOP);
         // West
-        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, 0, width, LAYER_7 - 1, LAYER_7, STAIRS_EAST);
+        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, 0, width, edgeMaxY - 1, edgeMaxY, STAIRS_EAST);
         fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, 0, width, edgeMinY, edgeMinY + 1, STAIRS_EAST_TOP);
         // Corner
-        setBlock(chunk, mutable, chunkX, chunkZ, x0, z0, LAYER_7 - 1, STAIRS_EAST.with(StairsBlock.SHAPE, StairShape.OUTER_LEFT));
+        setBlock(chunk, mutable, chunkX, chunkZ, x0, z0, edgeMaxY - 1, STAIRS_EAST.with(StairsBlock.SHAPE, StairShape.OUTER_LEFT));
         setBlock(chunk, mutable, chunkX, chunkZ, x0, z0, edgeMinY, STAIRS_EAST_TOP.with(StairsBlock.SHAPE, StairShape.OUTER_LEFT));
       }
       case SOUTH_EAST -> {
         final int x0 = width - 1;
         final int z0 = width - 1;
-        fill(chunk, mutable, chunkX, chunkZ, 0, width, 0, width, edgeMinY, LAYER_7, TERRAIN);
+        fill(chunk, mutable, chunkX, chunkZ, 0, width, 0, width, edgeMinY, edgeMaxY, TERRAIN);
         // South
-        fill(chunk, mutable, chunkX, chunkZ, 0, width, z0, z0 + 1, LAYER_7 - 1, LAYER_7, STAIRS_NORTH);
+        fill(chunk, mutable, chunkX, chunkZ, 0, width, z0, z0 + 1, edgeMaxY - 1, edgeMaxY, STAIRS_NORTH);
         fill(chunk, mutable, chunkX, chunkZ, 0, width, z0, z0 + 1, edgeMinY, edgeMinY + 1, STAIRS_NORTH_TOP);
         // East
-        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, 0, width, LAYER_7 - 1, LAYER_7, STAIRS_WEST);
+        fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, 0, width, edgeMaxY - 1, edgeMaxY, STAIRS_WEST);
         fill(chunk, mutable, chunkX, chunkZ, x0, x0 + 1, 0, width, edgeMinY, edgeMinY + 1, STAIRS_WEST_TOP);
         // Corner
-        setBlock(chunk, mutable, chunkX, chunkZ, x0, z0, LAYER_7 - 1, STAIRS_WEST.with(StairsBlock.SHAPE, StairShape.OUTER_RIGHT));
+        setBlock(chunk, mutable, chunkX, chunkZ, x0, z0, edgeMaxY - 1, STAIRS_WEST.with(StairsBlock.SHAPE, StairShape.OUTER_RIGHT));
         setBlock(chunk, mutable, chunkX, chunkZ, x0, z0, edgeMinY, STAIRS_WEST_TOP.with(StairsBlock.SHAPE, StairShape.OUTER_RIGHT));
       }
     }

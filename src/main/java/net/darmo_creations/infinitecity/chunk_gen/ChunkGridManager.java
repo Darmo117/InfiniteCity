@@ -148,14 +148,24 @@ public class ChunkGridManager {
   }
 
   public enum HoleDirection {
-    NORTH,
-    SOUTH,
-    WEST,
-    EAST,
-    NORTH_WEST,
-    NORTH_EAST,
-    SOUTH_WEST,
-    SOUTH_EAST;
+    NORTH(Direction.NORTH),
+    SOUTH(Direction.SOUTH),
+    WEST(Direction.WEST),
+    EAST(Direction.EAST),
+    NORTH_WEST(Direction.NORTH, Direction.WEST),
+    NORTH_EAST(Direction.NORTH, Direction.EAST),
+    SOUTH_WEST(Direction.SOUTH, Direction.WEST),
+    SOUTH_EAST(Direction.SOUTH, Direction.EAST);
+
+    private final List<Direction> horizontalDirections;
+
+    HoleDirection(Direction... horizontalDirections) {
+      this.horizontalDirections = List.of(horizontalDirections);
+    }
+
+    public boolean faces(Direction direction) {
+      return this.horizontalDirections.contains(direction);
+    }
 
     public static HoleDirection forAxisAndDirection(Direction.Axis axis, Direction.AxisDirection direction) {
       return switch (axis) {

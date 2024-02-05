@@ -69,6 +69,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   private static final BlockState BEDROCK = Blocks.BEDROCK.getDefaultState();
   private static final BlockState TERRAIN = Blocks.LIGHT_GRAY_CONCRETE.getDefaultState();
   private static final BlockState BLACK = Blocks.BLACK_CONCRETE.getDefaultState();
+  private static final BlockState SLAB = ModBlocks.LIGHT_GRAY_CONCRETE_SLAB.getDefaultState();
   private static final BlockState LIGHT_BLOCK = ModBlocks.LIGHT_BLOCKS[14].getDefaultState();
   private static final BlockState GLASS_PANE = Blocks.LIGHT_GRAY_STAINED_GLASS_PANE.getDefaultState();
   private static final BlockState GLASS_PANE_X = GLASS_PANE.with(PaneBlock.WEST, true).with(PaneBlock.EAST, true);
@@ -599,19 +600,20 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   }
 
   private static void generateBaseLayerElevation(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {
-    // TODO tweak
     final DoublePerlinNoiseSampler sampler =
-        DoublePerlinNoiseSampler.create(getRandom(structureAccessor), -4, 1.0);
+        DoublePerlinNoiseSampler.create(getRandom(structureAccessor), 0, 1.0);
     final int precision = 8;
-    for (int dx = 0; dx < 16; dx++) {
+    for (int dx = 0; dx < 16; dx += precision) {
       final int x = getHPos(chunkX, dx);
-      for (int dz = 0; dz < 16; dz++) {
+      for (int dz = 0; dz < 16; dz += precision) {
         final int z = getHPos(chunkZ, dz);
-        //noinspection IntegerDivisionInFloatingPointContext
-        final double sample = (sampler.sample(x / precision, LAYER_2, z / precision) + 1) * 2;
-        for (int dy = 0; dy < sample; dy++) {
-          chunk.setBlockState(mutable.set(x, LAYER_2 + dy, z), TERRAIN, false);
-        }
+        final double sample = Math.abs(sampler.sample(x, LAYER_2, z)) * 3;
+        int floor = MathHelper.floor(sample);
+        int topY = LAYER_2 + floor;
+        if (floor > 0)
+          fill(chunk, mutable, chunkX, chunkZ, dx, dx + precision, dz, dz + precision, LAYER_2, topY, TERRAIN);
+        if (sample - floor >= 0.5)
+          fill(chunk, mutable, chunkX, chunkZ, dx, dx + precision, dz, dz + precision, topY, topY + 1, SLAB);
       }
     }
   }

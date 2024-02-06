@@ -11,7 +11,6 @@ import net.minecraft.util.*;
 /**
  * Declares all blocks added by this mod.
  */
-@SuppressWarnings("unused")
 public final class ModBlocks {
   public static final StairsBlock LIGHT_GRAY_CONCRETE_STAIRS = register(
       "light_gray_concrete_stairs",
@@ -28,6 +27,14 @@ public final class ModBlocks {
   public static final WallBlock LIGHT_GRAY_CONCRETE_WALL = register(
       "light_gray_concrete_wall",
       new WallBlock(Blocks.LIGHT_GRAY_CONCRETE.getSettings())
+  );
+  public static final ThickPostBlock LIGHT_GRAY_CONCRETE_THICK_POST = register(
+      "light_gray_concrete_thick_post",
+      new ThickPostBlock(Blocks.LIGHT_GRAY_CONCRETE.getSettings())
+  );
+  public static final PostBlock LIGHT_GRAY_CONCRETE_POST = register(
+      "light_gray_concrete_post",
+      new PostBlock(Blocks.LIGHT_GRAY_CONCRETE.getSettings())
   );
   public static final Block[] LIGHT_BLOCKS = new Block[15];
 
@@ -73,7 +80,10 @@ public final class ModBlocks {
       content.addAfter(LIGHT_GRAY_CONCRETE_STAIRS, LIGHT_GRAY_CONCRETE_SLAB.asItem());
       content.addAfter(LIGHT_GRAY_CONCRETE_SLAB, LIGHT_GRAY_CONCRETE_VSLAB.asItem());
       content.addAfter(LIGHT_GRAY_CONCRETE_VSLAB, LIGHT_GRAY_CONCRETE_WALL.asItem());
+      content.addAfter(LIGHT_GRAY_CONCRETE_WALL, LIGHT_GRAY_CONCRETE_THICK_POST.asItem());
+      content.addAfter(LIGHT_GRAY_CONCRETE_THICK_POST, LIGHT_GRAY_CONCRETE_POST.asItem());
     });
+
     ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {
       Item prev = Items.PEARLESCENT_FROGLIGHT;
       for (Block lightBlock : LIGHT_BLOCKS) {

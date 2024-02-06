@@ -1,0 +1,14 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "infinitecity:block/light_gray_concrete_thick_post_horizontal",
+      "y": 90
+    },
+    "axis=y": {
+      "model": "infinitecity:block/light_gray_concrete_thick_post"
+    },
+    "axis=z": {
+      "model": "infinitecity:block/light_gray_concrete_thick_post_horizontal"
+    }
+  }
+}

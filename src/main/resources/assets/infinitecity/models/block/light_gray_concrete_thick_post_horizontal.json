@@ -1,0 +1,6 @@
+{
+  "parent": "infinitecity:block/thick_post_horizontal",
+  "textures": {
+    "all": "minecraft:block/light_gray_concrete"
+  }
+}

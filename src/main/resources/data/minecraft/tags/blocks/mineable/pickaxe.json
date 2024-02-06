@@ -3,6 +3,8 @@
   "values": [
     "infinitecity:light_gray_concrete_slab",
     "infinitecity:light_gray_concrete_vertical_slab",
-    "infinitecity:light_gray_concrete_stairs"
+    "infinitecity:light_gray_concrete_stairs",
+    "infinitecity:light_gray_concrete_post",
+    "#infinitecity:thick_posts"
   ]
 }

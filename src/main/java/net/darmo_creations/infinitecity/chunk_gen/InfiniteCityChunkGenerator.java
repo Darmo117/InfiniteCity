@@ -91,6 +91,10 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
       new ChunkGridManager(8, 28, 12, 12, true),
       new ChunkGridManager(8, 28, -6, -6, true)
   );
+  private static final List<ChunkGridManager> COLUMNS_GRID_MANAGERS = List.of(
+      new ChunkGridManager(2, 10, 9, 9, false),
+      new ChunkGridManager(2, 10, -9, -9, false)
+  );
   private static final ChunkGridManager LAYER_10_GRID_MANAGER = new ChunkGridManager(32, 4, 0, 0, false);
 
   private final InfiniteCityChunkGeneratorConfig config;
@@ -461,18 +465,40 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   }
 
   private static void generateColumnsAroundHoles(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int bottomY, int topY) {
-    for (var gm : LAYER_8_GRID_MANAGERS) {
-      final int blockSize = gm.getBlockSize();
-      final int totalSize = blockSize + gm.getBlockSpacing();
-      final var xz = gm.getGridXZ(chunkX, chunkZ);
-      final int gx = xz.getLeft();
-      final int gz = xz.getRight();
-      if ((gx == blockSize + 1 || gx == blockSize + 2) && (gz == blockSize + 1 || gz == blockSize + 2)
-          || (gx == blockSize + 1 || gx == blockSize + 2) && (gz == totalSize - 2 || gz == totalSize - 3)
-          || (gx == totalSize - 2 || gx == totalSize - 3) && (gz == blockSize + 1 || gz == blockSize + 2)
-          || (gx == totalSize - 2 || gx == totalSize - 3) && (gz == totalSize - 2 || gz == totalSize - 3)) {
-        fillChunkTerrain(chunk, mutable, chunkX, chunkZ, bottomY, topY);
-        // TODO add side/corner ornamentations
+    if (LAYER_6_GRID_MANAGER.shouldBeFilled(chunkX, chunkZ)) { // Avoid floating columns
+      for (ChunkGridManager gm : COLUMNS_GRID_MANAGERS) {
+        if (gm.shouldBeFilled(chunkX, chunkZ)) {
+          fillChunkTerrain(chunk, mutable, chunkX, chunkZ, bottomY, topY);
+        } else {
+          gm.isPastEdge(chunkX, chunkZ).ifPresent(d -> {
+            switch (d) {
+              case NORTH -> {
+              }
+              case SOUTH -> {
+              }
+              case WEST -> {
+              }
+              case EAST -> {
+              }
+              case NORTH_WEST -> {
+                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, bottomY, bottomY + 16);
+                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, topY - 16, topY);
+              }
+              case NORTH_EAST -> {
+                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, bottomY, bottomY + 16);
+                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, topY - 16, topY);
+              }
+              case SOUTH_WEST -> {
+                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, bottomY, bottomY + 16);
+                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, topY - 16, topY);
+              }
+              case SOUTH_EAST -> {
+                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, bottomY, bottomY + 16);
+                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, topY - 16, topY);
+              }
+            }
+          });
+        }
       }
     }
   }

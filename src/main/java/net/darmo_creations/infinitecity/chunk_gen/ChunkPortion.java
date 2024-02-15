@@ -10,7 +10,7 @@ import java.util.*;
 class ChunkPortion {
   // Bounding box enclosing for optimization:
   // Only the array portions inside this BBox will be iterated over and placed into the world.
-  private int minX = 16;
+  private int minX = 16; // TODO per-layer min-max
   private int maxX = -1;
   private int minY = 16;
   private int maxY = -1;
@@ -64,6 +64,16 @@ class ChunkPortion {
     final int height = this.blockStates.length;
     this.fill(fromX, toX, fromZ, toZ, fromY, toY, bottomBlockState);
     this.fill(fromX, toX, fromZ, toZ, height - toY, height - fromY, topBlockState);
+  }
+
+  public void setBlock(int x, int z, int y, BlockState blockState) {
+    Objects.requireNonNull(blockState);
+    this.blockStates[y][z][x] = blockState;
+  }
+
+  public void setBlockMirror(int x, int z, int y, BlockState bottomBlockState, BlockState topBlockState) {
+    this.setBlock(x, z, y, bottomBlockState);
+    this.setBlock(x, z, this.blockStates.length - y - 1, topBlockState);
   }
 
   public void placeInWorld(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int bottomY) {

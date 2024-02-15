@@ -21,6 +21,9 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
 
+import static net.darmo_creations.infinitecity.chunk_gen.ChunkGenerationUtils.*;
+import static net.darmo_creations.infinitecity.chunk_gen.ChunkGeneratorData.*;
+
 /**
  * Notations:
  * <ul>
@@ -51,40 +54,42 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
           .apply(instance, instance.stable(InfiniteCityChunkGenerator::new))
   );
 
-  private static final int LAYER_1 = -2032; // Bedrock
-  private static final int LAYER_2 = LAYER_1 + 1; // Thin terrain layer
-  private static final int LAYER_3 = LAYER_2 + 1; // Empty space with columns, bridges, arches, etc.
-  private static final int LAYER_4 = LAYER_3 + 200; // ?
-  private static final int LAYER_5 = LAYER_4 + 200; // ?
-  private static final int LAYER_6 = LAYER_5 + 200; // On-grid blocks with windowed facades
-  private static final int LAYER_7 = LAYER_6 + 401; // Empty space with structures, hanging walkways and columns around holes of next layer
-  private static final int LAYER_8 = LAYER_7 + 128; // Plain layer with on-grid square holes
-  private static final int LAYER_9 = LAYER_8 + 412; // Empty space with ?
-  private static final int LAYER_10 = LAYER_9 + 128; // On-grid blocks
-  private static final int LAYER_11 = LAYER_10 + 200; // Empty space with desert landscapes atop blocks of previous layer
-  private static final int TOP = 2032; // Max allowed value
-  private static final int WORLD_HEIGHT = TOP - LAYER_1;
+  public static final int COLUMN_HEIGHT = 128;
 
-  private static final BlockState AIR = Blocks.AIR.getDefaultState();
-  private static final BlockState BEDROCK = Blocks.BEDROCK.getDefaultState();
-  private static final BlockState TERRAIN = Blocks.LIGHT_GRAY_CONCRETE.getDefaultState();
-  private static final BlockState BLACK = Blocks.BLACK_CONCRETE.getDefaultState();
-  private static final BlockState SLAB = ModBlocks.LIGHT_GRAY_CONCRETE_SLAB.getDefaultState();
-  private static final BlockState LIGHT_BLOCK = ModBlocks.LIGHT_BLOCKS[14].getDefaultState();
-  private static final BlockState GLASS_PANE = Blocks.LIGHT_GRAY_STAINED_GLASS_PANE.getDefaultState();
-  private static final BlockState GLASS_PANE_X = GLASS_PANE.with(PaneBlock.WEST, true).with(PaneBlock.EAST, true);
-  private static final BlockState GLASS_PANE_Z = GLASS_PANE.with(PaneBlock.NORTH, true).with(PaneBlock.SOUTH, true);
-  private static final BlockState SAND = Blocks.SAND.getDefaultState();
+  public static final int LAYER_1 = -2032; // Bedrock
+  public static final int LAYER_2 = LAYER_1 + 1; // Thin terrain layer
+  public static final int LAYER_3 = LAYER_2 + 1; // Empty space with columns, bridges, arches, etc.
+  public static final int LAYER_4 = LAYER_3 + 200; // ?
+  public static final int LAYER_5 = LAYER_4 + 200; // ?
+  public static final int LAYER_6 = LAYER_5 + 200; // On-grid blocks with windowed facades
+  public static final int LAYER_7 = LAYER_6 + 401; // Empty space with structures, hanging walkways and columns around holes of next layer
+  public static final int LAYER_8 = LAYER_7 + COLUMN_HEIGHT; // Plain layer with on-grid square holes
+  public static final int LAYER_9 = LAYER_8 + 412; // Empty space with ?
+  public static final int LAYER_10 = LAYER_9 + COLUMN_HEIGHT; // On-grid blocks
+  public static final int LAYER_11 = LAYER_10 + 200; // Empty space with desert landscapes atop blocks of previous layer
+  public static final int TOP = 2032; // Max allowed value
+  public static final int WORLD_HEIGHT = TOP - LAYER_1;
 
-  private static final BlockState STAIRS_BASE = ModBlocks.LIGHT_GRAY_CONCRETE_STAIRS.getDefaultState();
-  private static final BlockState STAIRS_SOUTH = STAIRS_BASE.with(StairsBlock.FACING, Direction.SOUTH);
-  private static final BlockState STAIRS_SOUTH_TOP = STAIRS_SOUTH.with(StairsBlock.HALF, BlockHalf.TOP);
-  private static final BlockState STAIRS_NORTH = STAIRS_BASE.with(StairsBlock.FACING, Direction.NORTH);
-  private static final BlockState STAIRS_NORTH_TOP = STAIRS_NORTH.with(StairsBlock.HALF, BlockHalf.TOP);
-  private static final BlockState STAIRS_WEST = STAIRS_BASE.with(StairsBlock.FACING, Direction.WEST);
-  private static final BlockState STAIRS_WEST_TOP = STAIRS_WEST.with(StairsBlock.HALF, BlockHalf.TOP);
-  private static final BlockState STAIRS_EAST = STAIRS_BASE.with(StairsBlock.FACING, Direction.EAST);
-  private static final BlockState STAIRS_EAST_TOP = STAIRS_EAST.with(StairsBlock.HALF, BlockHalf.TOP);
+  public static final BlockState AIR = Blocks.AIR.getDefaultState();
+  public static final BlockState BEDROCK = Blocks.BEDROCK.getDefaultState();
+  public static final BlockState TERRAIN = Blocks.LIGHT_GRAY_CONCRETE.getDefaultState();
+  public static final BlockState BLACK = Blocks.BLACK_CONCRETE.getDefaultState();
+  public static final BlockState SLAB = ModBlocks.LIGHT_GRAY_CONCRETE_SLAB.getDefaultState();
+  public static final BlockState LIGHT_BLOCK = ModBlocks.LIGHT_BLOCKS[14].getDefaultState();
+  public static final BlockState GLASS_PANE = Blocks.LIGHT_GRAY_STAINED_GLASS_PANE.getDefaultState();
+  public static final BlockState GLASS_PANE_X = GLASS_PANE.with(PaneBlock.WEST, true).with(PaneBlock.EAST, true);
+  public static final BlockState GLASS_PANE_Z = GLASS_PANE.with(PaneBlock.NORTH, true).with(PaneBlock.SOUTH, true);
+  public static final BlockState SAND = Blocks.SAND.getDefaultState();
+
+  public static final BlockState STAIRS_BASE = ModBlocks.LIGHT_GRAY_CONCRETE_STAIRS.getDefaultState();
+  public static final BlockState STAIRS_SOUTH = STAIRS_BASE.with(StairsBlock.FACING, Direction.SOUTH);
+  public static final BlockState STAIRS_SOUTH_TOP = STAIRS_SOUTH.with(StairsBlock.HALF, BlockHalf.TOP);
+  public static final BlockState STAIRS_NORTH = STAIRS_BASE.with(StairsBlock.FACING, Direction.NORTH);
+  public static final BlockState STAIRS_NORTH_TOP = STAIRS_NORTH.with(StairsBlock.HALF, BlockHalf.TOP);
+  public static final BlockState STAIRS_WEST = STAIRS_BASE.with(StairsBlock.FACING, Direction.WEST);
+  public static final BlockState STAIRS_WEST_TOP = STAIRS_WEST.with(StairsBlock.HALF, BlockHalf.TOP);
+  public static final BlockState STAIRS_EAST = STAIRS_BASE.with(StairsBlock.FACING, Direction.EAST);
+  public static final BlockState STAIRS_EAST_TOP = STAIRS_EAST.with(StairsBlock.HALF, BlockHalf.TOP);
 
   private static final ChunkGridManager LAYER_6_GRID_MANAGER = new ChunkGridManager(14, 4, 0, 0, false);
   private static final List<ChunkGridManager> LAYER_8_GRID_MANAGERS = List.of(
@@ -465,40 +470,44 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   }
 
   private static void generateColumnsAroundHoles(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int bottomY, int topY) {
-    if (LAYER_6_GRID_MANAGER.shouldBeFilled(chunkX, chunkZ)) { // Avoid floating columns
-      for (ChunkGridManager gm : COLUMNS_GRID_MANAGERS) {
-        if (gm.shouldBeFilled(chunkX, chunkZ)) {
-          fillChunkTerrain(chunk, mutable, chunkX, chunkZ, bottomY, topY);
-        } else {
-          gm.isPastEdge(chunkX, chunkZ).ifPresent(d -> {
-            switch (d) {
-              case NORTH -> {
-              }
-              case SOUTH -> {
-              }
-              case WEST -> {
-              }
-              case EAST -> {
-              }
-              case NORTH_WEST -> {
-                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, bottomY, bottomY + 16);
-                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, topY - 16, topY);
-              }
-              case NORTH_EAST -> {
-                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, bottomY, bottomY + 16);
-                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, topY - 16, topY);
-              }
-              case SOUTH_WEST -> {
-                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, bottomY, bottomY + 16);
-                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, topY - 16, topY);
-              }
-              case SOUTH_EAST -> {
-                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, bottomY, bottomY + 16);
-                fillChunkTerrain(chunk, mutable, chunkX, chunkZ, topY - 16, topY);
-              }
-            }
-          });
-        }
+    if (!LAYER_6_GRID_MANAGER.shouldBeFilled(chunkX, chunkZ)) { // Avoid floating columns
+      return;
+    }
+
+    for (final var gm : COLUMNS_GRID_MANAGERS) {
+      if (gm.shouldBeFilled(chunkX, chunkZ)) {
+        fillChunkTerrain(chunk, mutable, chunkX, chunkZ, bottomY, topY);
+      } else {
+        final var xz = gm.getGridXZ(chunkX, chunkZ);
+        final int gx = xz.getLeft();
+        final int gz = xz.getRight();
+        gm.isPastEdge(chunkX, chunkZ).ifPresent(d -> {
+          switch (d) {
+            case NORTH -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnSide(),
+                BlockRotation.COUNTERCLOCKWISE_90, gx == 0 ? BlockMirror.NONE : BlockMirror.FRONT_BACK);
+
+            case SOUTH -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnSide(),
+                BlockRotation.CLOCKWISE_90, gx == 1 ? BlockMirror.NONE : BlockMirror.FRONT_BACK);
+
+            case WEST -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnSide(),
+                BlockRotation.CLOCKWISE_180, gz == 1 ? BlockMirror.NONE : BlockMirror.LEFT_RIGHT);
+
+            case EAST -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnSide(),
+                BlockRotation.NONE, gz == 0 ? BlockMirror.NONE : BlockMirror.LEFT_RIGHT);
+
+            case NORTH_WEST -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnCorner(),
+                BlockRotation.CLOCKWISE_180, BlockMirror.NONE);
+
+            case NORTH_EAST -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnCorner(),
+                BlockRotation.COUNTERCLOCKWISE_90, BlockMirror.NONE);
+
+            case SOUTH_WEST -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnCorner(),
+                BlockRotation.CLOCKWISE_90, BlockMirror.NONE);
+
+            case SOUTH_EAST -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnCorner(),
+                BlockRotation.NONE, BlockMirror.NONE);
+          }
+        });
       }
     }
   }
@@ -506,7 +515,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   private static void generateLayerWithHoles(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ) {
     if (LAYER_8_GRID_MANAGERS.stream().allMatch(gm -> gm.shouldBeFilled(chunkX, chunkZ)))
       fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_8, LAYER_9);
-    for (var chunkGridManager : LAYER_8_GRID_MANAGERS) {
+    for (final var chunkGridManager : LAYER_8_GRID_MANAGERS) {
       chunkGridManager.isPastEdge(chunkX, chunkZ)
           .ifPresent(d -> generateHoleInnerRings(chunk, mutable, chunkX, chunkZ, d));
     }
@@ -571,26 +580,6 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     fillChunk(chunk, mutable, chunkX, chunkZ, bottomY, topY, TERRAIN);
   }
 
-  private static void fillChunk(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int bottomY, int topY, BlockState blockState) {
-    fill(chunk, mutable, chunkX, chunkZ, 0, 16, 0, 16, bottomY, topY, blockState);
-  }
-
-  private static void fill(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int fromX, int toX, int fromZ, int toZ, int bottomY, int topY, BlockState blockState) {
-    for (int y = bottomY; y < topY; y++) {
-      for (int dx = fromX; dx < toX; dx++) {
-        final int x = getHPos(chunkX, dx);
-        for (int dz = fromZ; dz < toZ; dz++) {
-          final int z = getHPos(chunkZ, dz);
-          chunk.setBlockState(mutable.set(x, y, z), blockState, false);
-        }
-      }
-    }
-  }
-
-  private static void setBlock(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int x, int z, int y, BlockState blockState) {
-    chunk.setBlockState(mutable.set(getHPos(chunkX, x), y, getHPos(chunkZ, z)), blockState, false);
-  }
-
   /**
    * Place the surface blocks of the biomes after the noise has been generated.
    */
@@ -626,10 +615,6 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   private static ChunkRandom getRandom(StructureAccessor structureAccessor) {
     final long seed = ((ChunkRegion) ((StructureAccessorAccessor) structureAccessor).getWorld()).toServerWorld().getSeed();
     return new ChunkRandom(new CheckedRandom(seed));
-  }
-
-  private static int getHPos(int chunkCoord, int d) {
-    return ChunkSectionPos.getOffsetPos(chunkCoord, d);
   }
 
   /**

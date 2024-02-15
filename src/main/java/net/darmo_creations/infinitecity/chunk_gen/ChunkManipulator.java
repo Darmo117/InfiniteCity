@@ -5,11 +5,27 @@ import net.minecraft.util.*;
 
 import java.util.*;
 
-public class ChunkRotator {
-  public static BlockState[][][] rotateChunk(final BlockState[][][] blockStates, BlockRotation rotation) {
+final class ChunkManipulator {
+  static BlockState[][][] mirrorChunk(final BlockState[][][] blockStates, BlockMirror mirror) {
+    if (mirror == BlockMirror.NONE) return blockStates;
+
     final BlockState[][][] out = copy(blockStates, new BlockState[blockStates.length][16][16]);
 
-    if (rotation == BlockRotation.NONE) return out;
+    for (final var layer : out) {
+      mirrorLayer(layer, mirror);
+      for (int x = 0; x < 16; x++)
+        for (int z = 0; z < 16; z++)
+          if (layer[z][x] != null)
+            layer[z][x] = layer[z][x].mirror(mirror);
+    }
+
+    return out;
+  }
+
+  static BlockState[][][] rotateChunk(final BlockState[][][] blockStates, BlockRotation rotation) {
+    if (rotation == BlockRotation.NONE) return blockStates;
+
+    final BlockState[][][] out = copy(blockStates, new BlockState[blockStates.length][16][16]);
 
     for (final var layer : out) {
       rotateLayer(layer, rotation);
@@ -23,8 +39,15 @@ public class ChunkRotator {
   }
 
   /*
-   * Util methods (package access for unit tests)
+   * Util methods (non-private for unit tests)
    */
+
+  static <T> void mirrorLayer(T[][] layer, BlockMirror mirror) {
+    switch (mirror) {
+      case LEFT_RIGHT -> reverseColumns(layer);
+      case FRONT_BACK -> reverseRows(layer);
+    }
+  }
 
   static <T> void rotateLayer(T[][] layer, BlockRotation rotation) {
     switch (rotation) {
@@ -87,5 +110,8 @@ public class ChunkRotator {
         dest[y][z] = Arrays.copyOf(source[y][z], length);
     }
     return dest;
+  }
+
+  private ChunkManipulator() {
   }
 }

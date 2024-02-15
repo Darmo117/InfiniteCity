@@ -155,58 +155,60 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   }
 
   private static void generateBigBlocksInnerEdges(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, ChunkGridManager.HoleDirection holeDirection) {
+    final int y = LAYER_10 - 1;
     switch (holeDirection) {
       case NORTH -> getDesertInnerEdgeSide(BlockRotation.COUNTERCLOCKWISE_90)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
 
       case SOUTH -> getDesertInnerEdgeSide(BlockRotation.CLOCKWISE_90)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
 
       case WEST -> getDesertInnerEdgeSide(BlockRotation.CLOCKWISE_180)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
 
       case EAST -> getDesertInnerEdgeSide(BlockRotation.NONE)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
 
       case NORTH_WEST -> getDesertInnerEdgeCorner(BlockRotation.CLOCKWISE_180)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
 
       case NORTH_EAST -> getDesertInnerEdgeCorner(BlockRotation.COUNTERCLOCKWISE_90)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
 
       case SOUTH_WEST -> getDesertInnerEdgeCorner(BlockRotation.CLOCKWISE_90)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
 
       case SOUTH_EAST -> getDesertInnerEdgeCorner(BlockRotation.NONE)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
     }
   }
 
   private static void generateBigBlocksOuterEdges(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, ChunkGridManager.HoleDirection holeDirection) {
+    final int y = LAYER_10 - 1;
     switch (holeDirection) {
       case NORTH -> getDesertOuterEdgeSide(BlockRotation.COUNTERCLOCKWISE_90)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
 
       case SOUTH -> getDesertOuterEdgeSide(BlockRotation.CLOCKWISE_90)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
 
       case WEST -> getDesertOuterEdgeSide(BlockRotation.CLOCKWISE_180)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
 
       case EAST -> getDesertOuterEdgeSide(BlockRotation.NONE)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
 
       case NORTH_WEST -> getDesertOuterEdgeCorner(BlockRotation.CLOCKWISE_180)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
 
       case NORTH_EAST -> getDesertOuterEdgeCorner(BlockRotation.COUNTERCLOCKWISE_90)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
 
       case SOUTH_WEST -> getDesertOuterEdgeCorner(BlockRotation.CLOCKWISE_90)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
 
       case SOUTH_EAST -> getDesertOuterEdgeCorner(BlockRotation.NONE)
-          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, y);
     }
   }
 

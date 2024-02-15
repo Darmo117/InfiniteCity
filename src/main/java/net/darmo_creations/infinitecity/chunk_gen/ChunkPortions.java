@@ -10,6 +10,7 @@ import java.util.*;
 import static net.darmo_creations.infinitecity.chunk_gen.ChunkGeneratorBlocks.*;
 
 final class ChunkPortions {
+  // Caches
   private static final Map<BlockRotation, ChunkPortion> COLUMN_CORNER = new HashMap<>();
   private static final Map<BlockRotation, Map<BlockMirror, ChunkPortion>> COLUMN_SIDE = new HashMap<>();
   private static final Map<BlockRotation, ChunkPortion> FACADE_EDGES_CORNER = new HashMap<>();
@@ -97,14 +98,28 @@ final class ChunkPortions {
     final int height = InfiniteCityChunkGenerator.COLUMN_HEIGHT;
     final ChunkPortion chunkPortion = new ChunkPortion(height);
 
-    chunkPortion.fill(0, 8, 0, 8, 28, height - 28, TERRAIN);
+    chunkPortion.fillMirrorTop(0, 8, 0, 8, 28, height / 2, TERRAIN);
+    chunkPortion.fillMirrorTop(0, 4, 9, 13, 36, height / 2, TERRAIN);
+    chunkPortion.fillMirrorTop(0, 4, 14, 16, 36, height / 2, TERRAIN);
 
     chunkPortion.fillMirrorTop(0, 12, 0, 16, 0, 20, TERRAIN);
     chunkPortion.fillMirrorTop(0, 10, 0, 16, 20, 28, TERRAIN);
+    chunkPortion.fillMirrorTop(0, 7, 8, 16, 28, 36, TERRAIN);
+
     final BlockState stairsWest = STAIRS.with(StairsBlock.FACING, Direction.WEST);
     final BlockState stairsWestTop = stairsWest.with(StairsBlock.HALF, BlockHalf.TOP);
+    for (int i = 1; i < 15; i += 4) {
+      chunkPortion.fillMirrorTop(12, 14, i, i + 2, 0, 16, TERRAIN);
+      chunkPortion.fillMirrorTop(13, 14, i, i + 2, 15, 16, stairsWest, stairsWestTop);
+      chunkPortion.fillMirrorTop(12, 13, i, i + 2, 16, 17, stairsWest, stairsWestTop);
+    }
+
     chunkPortion.fillMirrorTop(11, 12, 0, 16, 19, 20, stairsWest, stairsWestTop);
     chunkPortion.fillMirrorTop(10, 11, 0, 16, 20, 21, stairsWest, stairsWestTop);
+
+    chunkPortion.fillMirrorTop(9, 10, 0, 8, 28, 29, stairsWest, stairsWestTop);
+    chunkPortion.fillMirrorTop(8, 9, 0, 8, 29, 30, stairsWest, stairsWestTop);
+    chunkPortion.fillMirrorTop(8, 9, 0, 8, 28, 29, TERRAIN);
 
     COLUMN_SIDE.get(BlockRotation.NONE).put(BlockMirror.NONE, chunkPortion);
   }

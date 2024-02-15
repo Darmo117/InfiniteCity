@@ -319,14 +319,13 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   }
 
   private static void generateColumnsAroundHoles(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int bottomY, int topY) {
-    if (!LAYER_6_GRID_MANAGER.shouldBeFilled(chunkX, chunkZ)) { // Avoid floating columns
-      return;
-    }
+    // Avoid floating columns
+    if (!LAYER_6_GRID_MANAGER.shouldBeFilled(chunkX, chunkZ)) return;
 
     for (final var gm : COLUMNS_GRID_MANAGERS) {
-      if (gm.shouldBeFilled(chunkX, chunkZ)) {
+      if (gm.shouldBeFilled(chunkX, chunkZ))
         fillChunkTerrain(chunk, mutable, chunkX, chunkZ, bottomY, topY);
-      } else {
+      else {
         final var xz = gm.getGridXZ(chunkX, chunkZ);
         final int gx = xz.getLeft();
         final int gz = xz.getRight();

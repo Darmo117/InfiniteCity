@@ -8,52 +8,41 @@ import net.minecraft.world.chunk.*;
 import java.util.*;
 
 class ChunkPortion {
-  // Bounding box enclosing for optimization:
-  // Only the array portions inside this BBox will be iterated over and placed into the world.
-  private int minX = 16; // TODO per-layer min-max
-  private int maxX = -1;
-  private int minY = 16;
-  private int maxY = -1;
-  private int minZ = 16;
-  private int maxZ = -1;
-
+  /**
+   * Optimization: only the array portions inside a each BBox will be iterated over
+   * in {@link #placeInWorld(Chunk, BlockPos.Mutable, int, int, int)}.
+   */
+  private final ChunkLayerBBox[] bBoxes;
   private final BlockState[][][] blockStates;
 
   public ChunkPortion(int height) {
     if (height <= 0) throw new IllegalArgumentException("height <= 0");
     this.blockStates = new BlockState[height][16][16];
+    this.bBoxes = new ChunkLayerBBox[height];
+    for (int i = 0; i < height; i++)
+      this.bBoxes[i] = new ChunkLayerBBox();
   }
 
   private ChunkPortion(final BlockState[][][] blockStates) {
     this.blockStates = blockStates;
+    this.bBoxes = new ChunkLayerBBox[blockStates.length];
     for (int y = 0; y < blockStates.length; y++) {
-      for (int z = 0; z < 16; z++) {
-        for (int x = 0; x < 16; x++) {
-          if (blockStates[y][z][x] != null) {
-            this.minX = Math.min(this.minX, x);
-            this.maxX = Math.max(this.maxX, x);
-            this.minY = Math.min(this.minY, y);
-            this.maxY = Math.max(this.maxY, y);
-            this.minZ = Math.min(this.minZ, z);
-            this.maxZ = Math.max(this.maxZ, z);
-          }
-        }
-      }
+      this.bBoxes[y] = new ChunkLayerBBox();
+      for (int z = 0; z < 16; z++)
+        for (int x = 0; x < 16; x++)
+          if (blockStates[y][z][x] != null)
+            this.bBoxes[y].update(x, z);
     }
   }
 
   public void fill(int fromX, int toX, int fromZ, int toZ, int fromY, int toY, BlockState blockState) {
     Objects.requireNonNull(blockState);
-    this.minX = Math.min(this.minX, fromX);
-    this.maxX = Math.max(this.maxX, toX - 1);
-    this.minY = Math.min(this.minY, fromY);
-    this.maxY = Math.max(this.maxY, toY - 1);
-    this.minZ = Math.min(this.minZ, fromZ);
-    this.maxZ = Math.max(this.maxZ, toZ - 1);
-    for (int y = fromY; y < toY; y++)
+    for (int y = fromY; y < toY; y++) {
+      this.bBoxes[y].update(fromX, toX - 1, fromZ, toZ - 1);
       for (int z = fromZ; z < toZ; z++)
         for (int x = fromX; x < toX; x++)
           this.blockStates[y][z][x] = blockState;
+    }
   }
 
   public void fillMirrorTop(int fromX, int toX, int fromZ, int toZ, int fromY, int toY, BlockState blockState) {
@@ -68,6 +57,7 @@ class ChunkPortion {
 
   public void setBlock(int x, int z, int y, BlockState blockState) {
     Objects.requireNonNull(blockState);
+    this.bBoxes[y].update(x, z);
     this.blockStates[y][z][x] = blockState;
   }
 
@@ -77,11 +67,12 @@ class ChunkPortion {
   }
 
   public void placeInWorld(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int bottomY) {
-    for (int dy = this.minY; dy <= this.maxY; dy++) {
+    for (int dy = 0; dy < this.blockStates.length; dy++) {
+      final ChunkLayerBBox bBox = this.bBoxes[dy];
       final int y = bottomY + dy;
-      for (int dz = this.minZ; dz <= this.maxZ; dz++) {
+      for (int dz = bBox.minZ(); dz <= bBox.maxZ(); dz++) {
         final int z = ChunkGenerationUtils.getHPos(chunkZ, dz);
-        for (int dx = this.minX; dx <= this.maxX; dx++) {
+        for (int dx = bBox.minX(); dx <= bBox.maxX(); dx++) {
           final int x = ChunkGenerationUtils.getHPos(chunkX, dx);
           final BlockState state = this.blockStates[dy][dz][dx];
           if (state != null)
@@ -136,10 +127,6 @@ class ChunkPortion {
 
     return out;
   }
-
-  /*
-   * Util methods (non-private for unit tests)
-   */
 
   static <T> void mirrorLayer(T[][] layer, BlockMirror mirror) {
     switch (mirror) {

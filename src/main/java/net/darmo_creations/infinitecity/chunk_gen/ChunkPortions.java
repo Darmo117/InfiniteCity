@@ -16,6 +16,10 @@ final class ChunkPortions {
   private static final Map<BlockRotation, ChunkPortion> FACADE_EDGES_SIDE = new HashMap<>();
   private static final Map<BlockRotation, ChunkPortion> INNER_RING_CORNER = new HashMap<>();
   private static final Map<BlockRotation, ChunkPortion> INNER_RING_SIDE = new HashMap<>();
+  private static final Map<BlockRotation, ChunkPortion> DESERT_OUTER_EDGE_CORNER = new HashMap<>();
+  private static final Map<BlockRotation, ChunkPortion> DESERT_OUTER_EDGE_SIDE = new HashMap<>();
+  private static final Map<BlockRotation, ChunkPortion> DESERT_INNER_EDGE_CORNER = new HashMap<>();
+  private static final Map<BlockRotation, ChunkPortion> DESERT_INNER_EDGE_SIDE = new HashMap<>();
 
   static ChunkPortion getColumnCorner(BlockRotation rotation) {
     return forRotation(COLUMN_CORNER, rotation, ChunkPortions::initDefaultColumnCorner);
@@ -48,6 +52,22 @@ final class ChunkPortions {
 
   static ChunkPortion getInnerRingSide(BlockRotation rotation) {
     return forRotation(INNER_RING_SIDE, rotation, ChunkPortions::initDefaultInnerRingSide);
+  }
+
+  static ChunkPortion getDesertOuterEdgeCorner(BlockRotation rotation) {
+    return forRotation(DESERT_OUTER_EDGE_CORNER, rotation, ChunkPortions::initDefaultDesertOuterEdgeCorner);
+  }
+
+  static ChunkPortion getDesertOuterEdgeSide(BlockRotation rotation) {
+    return forRotation(DESERT_OUTER_EDGE_SIDE, rotation, ChunkPortions::initDefaultDesertOuterEdgeSide);
+  }
+
+  static ChunkPortion getDesertInnerEdgeCorner(BlockRotation rotation) {
+    return forRotation(DESERT_INNER_EDGE_CORNER, rotation, ChunkPortions::initDefaultDesertInnerEdgeCorner);
+  }
+
+  static ChunkPortion getDesertInnerEdgeSide(BlockRotation rotation) {
+    return forRotation(DESERT_INNER_EDGE_SIDE, rotation, ChunkPortions::initDefaultDesertInnerEdgeSide);
   }
 
   private static ChunkPortion forRotation(Map<BlockRotation, ChunkPortion> map, BlockRotation rotation, Callback initDefault) {
@@ -169,6 +189,65 @@ final class ChunkPortions {
     chunkPortion.fill(x0, x0 + 1, 0, 16, 0, 1, stairsWestTop);
 
     INNER_RING_SIDE.put(BlockRotation.NONE, chunkPortion);
+  }
+
+  private static final int DESERT_EDGE_BLOCK_HALF_SIZE = 2;
+  private static final int DESERT_BLOCK_HEIGHT =
+      InfiniteCityChunkGenerator.DESERT_BLOCK_HEIGHT + InfiniteCityChunkGenerator.DESERT_BLOCK_EDGE_HEIGHT;
+
+  private static void initDefaultDesertOuterEdgeCorner() {
+    final int h = DESERT_EDGE_BLOCK_HALF_SIZE;
+    final int height = DESERT_BLOCK_HEIGHT;
+    final ChunkPortion chunkPortion = new ChunkPortion(height + h);
+
+    final int smallBlockBottomY = height - h;
+    final int smallBlockTopY = height + h;
+    chunkPortion.fill(0, 1, 0, 1, 0, height - h, TERRAIN);
+    chunkPortion.fill(0, h, 0, h, smallBlockBottomY, smallBlockTopY, TERRAIN);
+
+    DESERT_OUTER_EDGE_CORNER.put(BlockRotation.NONE, chunkPortion);
+  }
+
+  private static void initDefaultDesertOuterEdgeSide() {
+    final int h = DESERT_EDGE_BLOCK_HALF_SIZE;
+    final int height = DESERT_BLOCK_HEIGHT;
+    final ChunkPortion chunkPortion = new ChunkPortion(height + h);
+
+    final int smallBlockBottomY = height - h;
+    final int smallBlockTopY = height + h;
+    chunkPortion.fill(0, 1, 0, 1, 0, height - h, TERRAIN);
+    chunkPortion.fill(0, 1, 15, 16, 0, height - h, TERRAIN);
+    chunkPortion.fill(0, h, 0, h, smallBlockBottomY, smallBlockTopY, TERRAIN);
+    chunkPortion.fill(0, h, 16 - h, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
+
+    DESERT_OUTER_EDGE_SIDE.put(BlockRotation.NONE, chunkPortion);
+  }
+
+  private static void initDefaultDesertInnerEdgeCorner() {
+    final int h = DESERT_EDGE_BLOCK_HALF_SIZE;
+    final int height = DESERT_BLOCK_HEIGHT;
+    final ChunkPortion chunkPortion = new ChunkPortion(height + h);
+
+    final int smallBlockBottomY = height - h;
+    final int smallBlockTopY = height + h;
+    chunkPortion.fill(16 - h, 16, 0, h, smallBlockBottomY, smallBlockTopY, TERRAIN);
+    chunkPortion.fill(16 - h, 16, 16 - h, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
+    chunkPortion.fill(0, h, 16 - h, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
+
+    DESERT_INNER_EDGE_CORNER.put(BlockRotation.NONE, chunkPortion);
+  }
+
+  private static void initDefaultDesertInnerEdgeSide() {
+    final int h = DESERT_EDGE_BLOCK_HALF_SIZE;
+    final int height = DESERT_BLOCK_HEIGHT;
+    final ChunkPortion chunkPortion = new ChunkPortion(height + h);
+
+    final int smallBlockBottomY = height - h;
+    final int smallBlockTopY = height + h;
+    chunkPortion.fill(16 - h, 16, 0, h, smallBlockBottomY, smallBlockTopY, TERRAIN);
+    chunkPortion.fill(16 - h, 16, 16 - h, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
+
+    DESERT_INNER_EDGE_SIDE.put(BlockRotation.NONE, chunkPortion);
   }
 
   @FunctionalInterface

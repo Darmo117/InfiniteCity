@@ -56,6 +56,8 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   public static final int FACADE_HEIGHT = 401;
   public static final int COLUMN_HEIGHT = 128;
   public static final int INNER_RING_HEIGHT = 8;
+  public static final int DESERT_BLOCK_HEIGHT = 200;
+  public static final int DESERT_BLOCK_EDGE_HEIGHT = 8;
 
   public static final int LAYER_1 = -2032; // Bedrock
   public static final int LAYER_2 = LAYER_1 + 1; // Thin terrain layer
@@ -67,7 +69,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   public static final int LAYER_8 = LAYER_7 + COLUMN_HEIGHT; // Plain layer with on-grid square holes
   public static final int LAYER_9 = LAYER_8 + 412; // Empty space with ?
   public static final int LAYER_10 = LAYER_9 + COLUMN_HEIGHT; // On-grid blocks
-  public static final int LAYER_11 = LAYER_10 + 200; // Empty space with desert landscapes atop blocks of previous layer
+  public static final int LAYER_11 = LAYER_10 + DESERT_BLOCK_HEIGHT; // Empty space with desert landscapes atop blocks of previous layer
   public static final int TOP = 2032; // Max allowed value
   public static final int WORLD_HEIGHT = TOP - LAYER_1;
 
@@ -129,154 +131,82 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   }
 
   private static void generateBigBlocksAndDesertLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {
-    int edgeTop = LAYER_11 + 8;
     if (LAYER_10_GRID_MANAGER.shouldBeFilled(chunkX, chunkZ)) {
       fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_10, LAYER_11);
-      var atEdge = LAYER_10_GRID_MANAGER.isAtEdge(chunkX, chunkZ);
+      final var atEdge = LAYER_10_GRID_MANAGER.isAtEdge(chunkX, chunkZ);
       if (atEdge.isPresent()) {
-        fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_11, edgeTop); // Block edge
-        generateDesertEgdePillars(chunk, mutable, chunkX, chunkZ, edgeTop);
-        generateBigBlocksInnerEdges(chunk, mutable, chunkX, chunkZ, edgeTop, atEdge.get());
+        fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_11, LAYER_11 + DESERT_BLOCK_EDGE_HEIGHT); // Desert edge
+        generateDesertEgdePillars(chunk, mutable, chunkX, chunkZ);
+        generateBigBlocksInnerEdges(chunk, mutable, chunkX, chunkZ, atEdge.get());
       } else {
         generateDunes(chunk, mutable, chunkX, chunkZ, structureAccessor);
-        erodeDunesNearEdge(chunk, mutable, chunkX, chunkZ, edgeTop);
+        erodeDunesNearEdge(chunk, mutable, chunkX, chunkZ);
       }
     } else
       LAYER_10_GRID_MANAGER.isPastEdge(chunkX, chunkZ)
-          .ifPresent(d -> generateBigBlocksOuterEdges(chunk, mutable, chunkX, chunkZ, edgeTop, d));
+          .ifPresent(d -> generateBigBlocksOuterEdges(chunk, mutable, chunkX, chunkZ, d));
   }
 
-  private static void generateDesertEgdePillars(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int edgeTop) {
-    int y = edgeTop;
+  private static void generateDesertEgdePillars(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ) {
+    int y = LAYER_11 + DESERT_BLOCK_EDGE_HEIGHT;
     fill(chunk, mutable, chunkX, chunkZ, 6, 10, 6, 10, y, y += 4, TERRAIN);
     fill(chunk, mutable, chunkX, chunkZ, 5, 11, 5, 11, y, y += 6, TERRAIN);
     fill(chunk, mutable, chunkX, chunkZ, 4, 12, 4, 12, y, y + 8, TERRAIN);
   }
 
-  private static void generateBigBlocksInnerEdges(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int edgeTop, ChunkGridManager.HoleDirection holeDirection) {
-    final int smallBlockBottomY = edgeTop - 2;
-    final int smallBlockTopY = edgeTop + 2;
+  private static void generateBigBlocksInnerEdges(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, ChunkGridManager.HoleDirection holeDirection) {
     switch (holeDirection) {
-      case NORTH -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, edgeTop, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, edgeTop, smallBlockTopY, TERRAIN);
-      }
-      case SOUTH -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, edgeTop, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, edgeTop, smallBlockTopY, TERRAIN);
-      }
-      case WEST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, edgeTop, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, edgeTop, smallBlockTopY, TERRAIN);
-      }
-      case EAST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, smallBlockBottomY, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
-      }
-      case NORTH_WEST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, smallBlockBottomY, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, smallBlockBottomY, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
-      }
-      case NORTH_EAST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, smallBlockBottomY, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, smallBlockBottomY, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
-      }
-      case SOUTH_WEST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, smallBlockBottomY, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
-      }
-      case SOUTH_EAST -> {
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, smallBlockBottomY, smallBlockTopY, TERRAIN);
-      }
+      case NORTH -> getDesertInnerEdgeSide(BlockRotation.COUNTERCLOCKWISE_90)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+
+      case SOUTH -> getDesertInnerEdgeSide(BlockRotation.CLOCKWISE_90)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+
+      case WEST -> getDesertInnerEdgeSide(BlockRotation.CLOCKWISE_180)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+
+      case EAST -> getDesertInnerEdgeSide(BlockRotation.NONE)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+
+      case NORTH_WEST -> getDesertInnerEdgeCorner(BlockRotation.CLOCKWISE_180)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+
+      case NORTH_EAST -> getDesertInnerEdgeCorner(BlockRotation.COUNTERCLOCKWISE_90)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+
+      case SOUTH_WEST -> getDesertInnerEdgeCorner(BlockRotation.CLOCKWISE_90)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+
+      case SOUTH_EAST -> getDesertInnerEdgeCorner(BlockRotation.NONE)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
     }
   }
 
-  private static void generateBigBlocksOuterEdges(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int edgeTop, ChunkGridManager.HoleDirection holeDirection) {
-    final int blockBottomY = LAYER_10;
-    final int smallBlockBottomY = edgeTop - 2;
-    final int smallBlockTopY = edgeTop + 2;
+  private static void generateBigBlocksOuterEdges(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, ChunkGridManager.HoleDirection holeDirection) {
     switch (holeDirection) {
-      case NORTH -> {
-        final int z = getHPos(chunkZ, 15);
-        for (int dx = 0; dx < 16; dx += 15) {
-          final int x = getHPos(chunkX, dx);
-          for (int y = blockBottomY; y < smallBlockBottomY; y++) {
-            chunk.setBlockState(mutable.set(x, y, z), TERRAIN, false);
-          }
-        }
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
-      }
-      case SOUTH -> {
-        final int z = getHPos(chunkZ, 0);
-        for (int dx = 0; dx < 16; dx += 15) {
-          final int x = getHPos(chunkX, dx);
-          for (int y = blockBottomY; y < smallBlockBottomY; y++) {
-            chunk.setBlockState(mutable.set(x, y, z), TERRAIN, false);
-          }
-        }
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, smallBlockBottomY, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, smallBlockBottomY, smallBlockTopY, TERRAIN);
-      }
-      case WEST -> {
-        final int x = getHPos(chunkX, 15);
-        for (int dz = 0; dz < 16; dz += 15) {
-          final int z = getHPos(chunkZ, dz);
-          for (int y = blockBottomY; y < smallBlockBottomY; y++) {
-            chunk.setBlockState(mutable.set(x, y, z), TERRAIN, false);
-          }
-        }
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, smallBlockBottomY, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
-      }
-      case EAST -> {
-        final int x = getHPos(chunkX, 0);
-        for (int dz = 0; dz < 16; dz += 15) {
-          final int z = getHPos(chunkZ, dz);
-          for (int y = blockBottomY; y < smallBlockBottomY; y++) {
-            chunk.setBlockState(mutable.set(x, y, z), TERRAIN, false);
-          }
-        }
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, smallBlockBottomY, smallBlockTopY, TERRAIN);
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
-      }
-      case NORTH_WEST -> {
-        final int x = getHPos(chunkX, 15);
-        final int z = getHPos(chunkZ, 15);
-        for (int y = blockBottomY; y < smallBlockBottomY; y++) {
-          chunk.setBlockState(mutable.set(x, y, z), TERRAIN, false);
-        }
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 14, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
-      }
-      case NORTH_EAST -> {
-        final int x = getHPos(chunkX, 0);
-        final int z = getHPos(chunkZ, 15);
-        for (int y = blockBottomY; y < smallBlockBottomY; y++) {
-          chunk.setBlockState(mutable.set(x, y, z), TERRAIN, false);
-        }
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 14, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
-      }
-      case SOUTH_WEST -> {
-        final int x = getHPos(chunkX, 15);
-        final int z = getHPos(chunkZ, 0);
-        for (int y = blockBottomY; y < smallBlockBottomY; y++) {
-          chunk.setBlockState(mutable.set(x, y, z), TERRAIN, false);
-        }
-        fill(chunk, mutable, chunkX, chunkZ, 14, 16, 0, 2, smallBlockBottomY, smallBlockTopY, TERRAIN);
-      }
-      case SOUTH_EAST -> {
-        final int x = getHPos(chunkX, 0);
-        final int z = getHPos(chunkZ, 0);
-        for (int y = blockBottomY; y < smallBlockBottomY; y++) {
-          chunk.setBlockState(mutable.set(x, y, z), TERRAIN, false);
-        }
-        fill(chunk, mutable, chunkX, chunkZ, 0, 2, 0, 2, smallBlockBottomY, smallBlockTopY, TERRAIN);
-      }
+      case NORTH -> getDesertOuterEdgeSide(BlockRotation.COUNTERCLOCKWISE_90)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+
+      case SOUTH -> getDesertOuterEdgeSide(BlockRotation.CLOCKWISE_90)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+
+      case WEST -> getDesertOuterEdgeSide(BlockRotation.CLOCKWISE_180)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+
+      case EAST -> getDesertOuterEdgeSide(BlockRotation.NONE)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+
+      case NORTH_WEST -> getDesertOuterEdgeCorner(BlockRotation.CLOCKWISE_180)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+
+      case NORTH_EAST -> getDesertOuterEdgeCorner(BlockRotation.COUNTERCLOCKWISE_90)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+
+      case SOUTH_WEST -> getDesertOuterEdgeCorner(BlockRotation.CLOCKWISE_90)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
+
+      case SOUTH_EAST -> getDesertOuterEdgeCorner(BlockRotation.NONE)
+          .placeInWorld(chunk, mutable, chunkX, chunkZ, LAYER_10);
     }
   }
 
@@ -294,20 +224,22 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     }
   }
 
-  private static void erodeDunesNearEdge(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int edgeTop) {
+  private static void erodeDunesNearEdge(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ) {
+    final int edgeTop = LAYER_11 + DESERT_BLOCK_EDGE_HEIGHT;
+    final int erosionHeight = 10;
     if (LAYER_10_GRID_MANAGER.isAtEdge(chunkX - 1, chunkZ).isPresent()) {
-      for (int i = 0; i < 10; i++)
+      for (int i = 0; i < erosionHeight; i++)
         fill(chunk, mutable, chunkX, chunkZ, i, i + 1, 0, 16, edgeTop + i, edgeTop + 16, AIR);
     } else if (LAYER_10_GRID_MANAGER.isAtEdge(chunkX + 1, chunkZ).isPresent()) {
-      for (int i = 0; i < 10; i++)
+      for (int i = 0; i < erosionHeight; i++)
         fill(chunk, mutable, chunkX, chunkZ, 15 - i, 16 - i, 0, 16, edgeTop + i, edgeTop + 16, AIR);
     }
 
     if (LAYER_10_GRID_MANAGER.isAtEdge(chunkX, chunkZ - 1).isPresent()) {
-      for (int i = 0; i < 10; i++)
+      for (int i = 0; i < erosionHeight; i++)
         fill(chunk, mutable, chunkX, chunkZ, 0, 16, i, i + 1, edgeTop + i, edgeTop + 16, AIR);
     } else if (LAYER_10_GRID_MANAGER.isAtEdge(chunkX, chunkZ + 1).isPresent()) {
-      for (int i = 0; i < 10; i++)
+      for (int i = 0; i < erosionHeight; i++)
         fill(chunk, mutable, chunkX, chunkZ, 0, 16, 15 - i, 16 - i, edgeTop + i, edgeTop + 16, AIR);
     }
   }

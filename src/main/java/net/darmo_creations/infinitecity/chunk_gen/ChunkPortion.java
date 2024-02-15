@@ -56,6 +56,16 @@ class ChunkPortion {
           this.blockStates[y][z][x] = blockState;
   }
 
+  public void fillMirrorTop(int fromX, int toX, int fromZ, int toZ, int fromY, int toY, BlockState blockState) {
+    this.fillMirrorTop(fromX, toX, fromZ, toZ, fromY, toY, blockState, blockState);
+  }
+
+  public void fillMirrorTop(int fromX, int toX, int fromZ, int toZ, int fromY, int toY, BlockState bottomBlockState, BlockState topBlockState) {
+    final int height = this.blockStates.length;
+    this.fill(fromX, toX, fromZ, toZ, fromY, toY, bottomBlockState);
+    this.fill(fromX, toX, fromZ, toZ, height - toY, height - fromY, topBlockState);
+  }
+
   public void placeInWorld(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int bottomY) {
     for (int dy = this.minY; dy <= this.maxY; dy++) {
       final int y = bottomY + dy;

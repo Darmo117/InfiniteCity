@@ -33,13 +33,10 @@ final class ChunkPortions {
     final int height = InfiniteCityChunkGenerator.COLUMN_HEIGHT;
     final ChunkPortion chunkPortion = new ChunkPortion(height);
 
-    chunkPortion.fill(0, 16, 0, 16, 0, 16, InfiniteCityChunkGenerator.TERRAIN);
-    chunkPortion.fill(0, 8, 0, 8, 16, 24, InfiniteCityChunkGenerator.TERRAIN);
+    chunkPortion.fillMirrorTop(0, 16, 0, 16, 0, 16, InfiniteCityChunkGenerator.TERRAIN);
+    chunkPortion.fillMirrorTop(0, 8, 0, 8, 16, 24, InfiniteCityChunkGenerator.TERRAIN);
 
-    chunkPortion.fill(0, 16, 0, 16, height - 16, height, InfiniteCityChunkGenerator.TERRAIN);
-    chunkPortion.fill(0, 8, 0, 8, height - 24, height - 16, InfiniteCityChunkGenerator.TERRAIN);
-
-    chunkPortion.fill(0, 4, 0, 4, 16, height - 16, InfiniteCityChunkGenerator.TERRAIN);
+    chunkPortion.fill(0, 4, 0, 4, 24, height - 24, InfiniteCityChunkGenerator.TERRAIN);
 
     COLUMN_CORNER.put(BlockRotation.NONE, chunkPortion);
   }
@@ -51,15 +48,10 @@ final class ChunkPortions {
 
     chunkPortion.fill(0, 8, 0, 8, 28, height - 28, InfiniteCityChunkGenerator.TERRAIN);
 
-    chunkPortion.fill(0, 12, 0, 16, 0, 20, InfiniteCityChunkGenerator.TERRAIN);
-    chunkPortion.fill(0, 10, 0, 16, 20, 28, InfiniteCityChunkGenerator.TERRAIN);
-    chunkPortion.fill(11, 12, 0, 16, 19, 20, InfiniteCityChunkGenerator.STAIRS_WEST);
-    chunkPortion.fill(10, 11, 0, 16, 20, 21, InfiniteCityChunkGenerator.STAIRS_WEST);
-
-    chunkPortion.fill(0, 12, 0, 16, height - 20, height, InfiniteCityChunkGenerator.TERRAIN);
-    chunkPortion.fill(0, 10, 0, 16, height - 28, height - 20, InfiniteCityChunkGenerator.TERRAIN);
-    chunkPortion.fill(11, 12, 0, 16, height - 20, height - 19, InfiniteCityChunkGenerator.STAIRS_WEST_TOP);
-    chunkPortion.fill(10, 11, 0, 16, height - 21, height - 20, InfiniteCityChunkGenerator.STAIRS_WEST_TOP);
+    chunkPortion.fillMirrorTop(0, 12, 0, 16, 0, 20, InfiniteCityChunkGenerator.TERRAIN);
+    chunkPortion.fillMirrorTop(0, 10, 0, 16, 20, 28, InfiniteCityChunkGenerator.TERRAIN);
+    chunkPortion.fillMirrorTop(11, 12, 0, 16, 19, 20, InfiniteCityChunkGenerator.STAIRS_WEST, InfiniteCityChunkGenerator.STAIRS_WEST_TOP);
+    chunkPortion.fillMirrorTop(10, 11, 0, 16, 20, 21, InfiniteCityChunkGenerator.STAIRS_WEST, InfiniteCityChunkGenerator.STAIRS_WEST_TOP);
 
     COLUMN_SIDE.get(BlockRotation.NONE).put(BlockMirror.NONE, chunkPortion);
   }

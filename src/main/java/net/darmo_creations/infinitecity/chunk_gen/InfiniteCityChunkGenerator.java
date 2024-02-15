@@ -329,7 +329,6 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     final int topY = LAYER_7 - edgeHeight;
     final int bottomY = LAYER_6 + edgeHeight;
     final Function<Double, BlockState> getBlockState = sample -> sample > 0.25 ? LIGHT_BLOCK : BLACK;
-    // TODO generate features in gaps
     for (int y = topY; y - 3 > bottomY; y -= 3) {
       for (int d = 1; d < 15; d += 2) {
         if (holeDirection.faces(Direction.NORTH) || holeDirection.faces(Direction.SOUTH)) {
@@ -481,7 +480,8 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     final ChunkPos chunkPos = chunk.getPos();
     final int chunkX = chunkPos.x;
     final int chunkZ = chunkPos.z;
-    // TODO generate structures in layers 3 and 7, in deserts of 5 and below 10
+    // TODO generate structures in layers 3, 7, 9 and 11
+    // TODO generate features in gaps between windows on facades of layer 6
     generateBaseLayerElevation(chunk, mutable, chunkX, chunkZ, structureAccessor);
   }
 

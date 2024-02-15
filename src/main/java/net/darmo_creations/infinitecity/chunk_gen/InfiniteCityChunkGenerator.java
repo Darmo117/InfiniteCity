@@ -22,7 +22,7 @@ import java.util.concurrent.*;
 import java.util.function.*;
 
 import static net.darmo_creations.infinitecity.chunk_gen.ChunkGenerationUtils.*;
-import static net.darmo_creations.infinitecity.chunk_gen.ChunkGeneratorData.*;
+import static net.darmo_creations.infinitecity.chunk_gen.ChunkPortions.*;
 
 /**
  * Notations:
@@ -483,29 +483,30 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
         final int gz = xz.getRight();
         gm.isPastEdge(chunkX, chunkZ).ifPresent(d -> {
           switch (d) {
-            case NORTH -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnSide(),
-                BlockRotation.COUNTERCLOCKWISE_90, gx == 0 ? BlockMirror.NONE : BlockMirror.FRONT_BACK);
+            case NORTH ->
+                getColumnSide(BlockRotation.COUNTERCLOCKWISE_90, gx == 0 ? BlockMirror.NONE : BlockMirror.FRONT_BACK)
+                    .placeInWorld(chunk, mutable, chunkX, chunkZ, bottomY);
 
-            case SOUTH -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnSide(),
-                BlockRotation.CLOCKWISE_90, gx == 1 ? BlockMirror.NONE : BlockMirror.FRONT_BACK);
+            case SOUTH -> getColumnSide(BlockRotation.CLOCKWISE_90, gx == 1 ? BlockMirror.NONE : BlockMirror.FRONT_BACK)
+                .placeInWorld(chunk, mutable, chunkX, chunkZ, bottomY);
 
-            case WEST -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnSide(),
-                BlockRotation.CLOCKWISE_180, gz == 1 ? BlockMirror.NONE : BlockMirror.LEFT_RIGHT);
+            case WEST -> getColumnSide(BlockRotation.CLOCKWISE_180, gz == 1 ? BlockMirror.NONE : BlockMirror.LEFT_RIGHT)
+                .placeInWorld(chunk, mutable, chunkX, chunkZ, bottomY);
 
-            case EAST -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnSide(),
-                BlockRotation.NONE, gz == 0 ? BlockMirror.NONE : BlockMirror.LEFT_RIGHT);
+            case EAST -> getColumnSide(BlockRotation.NONE, gz == 0 ? BlockMirror.NONE : BlockMirror.LEFT_RIGHT)
+                .placeInWorld(chunk, mutable, chunkX, chunkZ, bottomY);
 
-            case NORTH_WEST -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnCorner(),
-                BlockRotation.CLOCKWISE_180, BlockMirror.NONE);
+            case NORTH_WEST -> getColumnCorner(BlockRotation.CLOCKWISE_180)
+                .placeInWorld(chunk, mutable, chunkX, chunkZ, bottomY);
 
-            case NORTH_EAST -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnCorner(),
-                BlockRotation.COUNTERCLOCKWISE_90, BlockMirror.NONE);
+            case NORTH_EAST -> getColumnCorner(BlockRotation.COUNTERCLOCKWISE_90)
+                .placeInWorld(chunk, mutable, chunkX, chunkZ, bottomY);
 
-            case SOUTH_WEST -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnCorner(),
-                BlockRotation.CLOCKWISE_90, BlockMirror.NONE);
+            case SOUTH_WEST -> getColumnCorner(BlockRotation.CLOCKWISE_90)
+                .placeInWorld(chunk, mutable, chunkX, chunkZ, bottomY);
 
-            case SOUTH_EAST -> placeBlocks(chunk, mutable, chunkX, chunkZ, bottomY, getColumnCorner(),
-                BlockRotation.NONE, BlockMirror.NONE);
+            case SOUTH_EAST -> getColumnCorner(BlockRotation.NONE)
+                .placeInWorld(chunk, mutable, chunkX, chunkZ, bottomY);
           }
         });
       }

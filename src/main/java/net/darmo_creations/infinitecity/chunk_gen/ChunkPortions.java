@@ -26,7 +26,8 @@ final class ChunkPortions {
   }
 
   static ChunkPortion getColumnSide(BlockRotation rotation, BlockMirror mirror) {
-    if (!COLUMN_SIDE.containsKey(BlockRotation.NONE))
+    if (!COLUMN_SIDE.containsKey(BlockRotation.NONE)
+        || !COLUMN_SIDE.get(BlockRotation.NONE).containsKey(BlockMirror.NONE))
       initDefaultColumnSide();
     if (!COLUMN_SIDE.containsKey(rotation))
       COLUMN_SIDE.put(rotation, new HashMap<>());
@@ -91,7 +92,8 @@ final class ChunkPortions {
   }
 
   private static void initDefaultColumnSide() {
-    COLUMN_SIDE.put(BlockRotation.NONE, new HashMap<>());
+    if (!COLUMN_SIDE.containsKey(BlockRotation.NONE))
+      COLUMN_SIDE.put(BlockRotation.NONE, new HashMap<>());
     final int height = InfiniteCityChunkGenerator.COLUMN_HEIGHT;
     final ChunkPortion chunkPortion = new ChunkPortion(height);
 
@@ -215,8 +217,9 @@ final class ChunkPortions {
 
     final int smallBlockBottomY = height - h;
     final int smallBlockTopY = height + h;
-    chunkPortion.fill(0, 1, 0, 1, 0, height - h, TERRAIN);
-    chunkPortion.fill(0, 1, 15, 16, 0, height - h, TERRAIN);
+    chunkPortion.fill(0, 1, 0, 16, 0, 1, TERRAIN);
+    chunkPortion.fill(0, 1, 0, 1, 1, height - h, TERRAIN);
+    chunkPortion.fill(0, 1, 15, 16, 1, height - h, TERRAIN);
     chunkPortion.fill(0, h, 0, h, smallBlockBottomY, smallBlockTopY, TERRAIN);
     chunkPortion.fill(0, h, 16 - h, 16, smallBlockBottomY, smallBlockTopY, TERRAIN);
 

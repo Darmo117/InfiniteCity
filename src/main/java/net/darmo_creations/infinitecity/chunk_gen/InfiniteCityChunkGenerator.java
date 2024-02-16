@@ -62,8 +62,8 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   public static final int LAYER_1 = -2032; // Bedrock
   public static final int LAYER_2 = LAYER_1 + 1; // Thin terrain layer
   public static final int LAYER_3 = LAYER_2 + 1; // Empty space with columns, bridges, arches, etc.
-  public static final int LAYER_4 = LAYER_3 + 200; // ?
-  public static final int LAYER_5 = LAYER_4 + 200; // ?
+  public static final int LAYER_4 = LAYER_3 + 200; // Plain layer with concentric hollow rings with suspended bridges spanning the gap
+  public static final int LAYER_5 = LAYER_4 + 400; // ?
   public static final int LAYER_6 = LAYER_5 + 200; // On-grid blocks with windowed facades
   public static final int LAYER_7 = LAYER_6 + FACADE_HEIGHT; // Empty space with structures, hanging walkways and columns around holes of next layer
   public static final int LAYER_8 = LAYER_7 + COLUMN_HEIGHT; // Plain layer with on-grid square holes
@@ -73,6 +73,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   public static final int TOP = 2032; // Max allowed value
   public static final int WORLD_HEIGHT = TOP - LAYER_1;
 
+  private static final ChunkCirclesManager LAYER_4_CIRCLE_MANAGER = new ChunkCirclesManager(20, 50, 0, 0);
   private static final ChunkGridManager LAYER_6_GRID_MANAGER = new ChunkGridManager(14, 4, 0, 0, false);
   private static final List<ChunkGridManager> LAYER_8_GRID_MANAGERS = List.of(
       new ChunkGridManager(8, 28, 12, 12, true),
@@ -114,6 +115,7 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     final int chunkZ = chunkPos.z;
     generateBedrockLayer(chunk, mutable, chunkX, chunkZ);
     generateBottomLayer(chunk, mutable, chunkX, chunkZ);
+    generateCirclesLayer(chunk, mutable, chunkX, chunkZ);
     generateBuildingsLayer(chunk, mutable, chunkX, chunkZ, structureAccessor);
     generateColumnsAroundHoles(chunk, mutable, chunkX, chunkZ, LAYER_7, LAYER_8);
     generateLayerWithHoles(chunk, mutable, chunkX, chunkZ);
@@ -244,6 +246,13 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
       for (int i = 0; i < erosionHeight; i++)
         fill(chunk, mutable, chunkX, chunkZ, 0, 16, 15 - i, 16 - i, edgeTop + i, edgeTop + 16, AIR);
     }
+  }
+
+  private static void generateCirclesLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ) {
+    if (LAYER_4_CIRCLE_MANAGER.shouldBeFilled(chunkX, chunkZ))
+      fillChunkTerrain(chunk, mutable, chunkX, chunkZ, LAYER_4, LAYER_5);
+    else
+      fill(chunk, mutable, chunkX, chunkZ, 0, 16, 0, 16, LAYER_5 - 32, LAYER_5, TERRAIN);
   }
 
   private static void generateBuildingsLayer(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {

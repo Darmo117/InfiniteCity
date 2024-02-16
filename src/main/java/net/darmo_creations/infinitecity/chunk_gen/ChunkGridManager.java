@@ -15,8 +15,8 @@ public class ChunkGridManager {
   /**
    * Create a chunk grid manager.
    *
-   * @param blockSize    The size of plain blocks in chunks.
-   * @param blockSpacing The size of the space between blocks in chunks.
+   * @param blockSize    The size of each block in chunks.
+   * @param blockSpacing The space between each block in chunks.
    * @param offsetX      The offset of the first block’s north-west corner from the 0 coordinate along the X axis.
    * @param offsetZ      The offset of the first block’s north-west corner from the 0 coordinate along the Z axis.
    * @param inverted     Whether to invert the filled/empty regions.
@@ -27,14 +27,6 @@ public class ChunkGridManager {
     this.offsetX = offsetX;
     this.offsetZ = offsetZ;
     this.inverted = inverted;
-  }
-
-  public int getBlockSize() {
-    return this.blockSize;
-  }
-
-  public int getBlockSpacing() {
-    return this.blockSpacing;
   }
 
   /**

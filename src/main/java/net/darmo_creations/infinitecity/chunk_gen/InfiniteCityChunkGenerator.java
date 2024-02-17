@@ -424,11 +424,11 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     final int chunkZ = chunkPos.z;
     // TODO generate structures in layers 3, 7, 9 and 11
     // TODO generate features in gaps between windows on facades of layer 6
-    this.generateFacadeStructures(chunk, mutable, chunkX, chunkZ, structureAccessor);
+    generateFacadeStructures(chunk, mutable, chunkX, chunkZ, structureAccessor);
     generateBaseLayerElevation(chunk, mutable, chunkX, chunkZ, structureAccessor);
   }
 
-  private void generateFacadeStructures(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {
+  private static void generateFacadeStructures(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {
     final int yOffset = 10;
     final var sampler = DoublePerlinNoiseSampler.create(getRandom(structureAccessor), 0, 1.0);
     final double threshold = 0.75;

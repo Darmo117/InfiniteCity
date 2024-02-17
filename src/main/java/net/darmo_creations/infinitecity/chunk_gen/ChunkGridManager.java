@@ -5,6 +5,9 @@ import net.minecraft.util.math.*;
 
 import java.util.*;
 
+/**
+ * This chunk manager generates blocks of specific width and spacing.
+ */
 public class ChunkGridManager {
   private final int blockSize;
   private final int blockSpacing;
@@ -15,8 +18,8 @@ public class ChunkGridManager {
   /**
    * Create a chunk grid manager.
    *
-   * @param blockSize    The size of each block in chunks.
-   * @param blockSpacing The space between each block in chunks.
+   * @param blockSize    The size of each block (in chunks).
+   * @param blockSpacing The space between each block (in chunks).
    * @param offsetX      The offset of the first block’s north-west corner from the 0 coordinate along the X axis.
    * @param offsetZ      The offset of the first block’s north-west corner from the 0 coordinate along the Z axis.
    * @param inverted     Whether to invert the filled/empty regions.
@@ -40,10 +43,26 @@ public class ChunkGridManager {
     return this.inverted != (this.isInBlock(chunkX, this.offsetX) && this.isInBlock(chunkZ, this.offsetZ));
   }
 
+  /**
+   * Return the block-relative (x, z) coordinates of the given chunk position.
+   * Each coordinate is between 0 and {@code blockSize + blockSpacing}.
+   *
+   * @param chunkX The chunk’s X position.
+   * @param chunkZ The chunk’s Z position.
+   * @return The (x, z) coordinates of the chunk.
+   */
   public Pair<Integer, Integer> getGridXZ(int chunkX, int chunkZ) {
     return new Pair<>(this.getGridI(chunkX, this.offsetX), this.getGridI(chunkZ, this.offsetZ));
   }
 
+  /**
+   * If the chunk at the given coordinates is at a block’s edge,
+   * return the nearby hole’s direction from the chunk’s position.
+   *
+   * @param chunkX The chunk’s X position.
+   * @param chunkZ The chunk’s Z position.
+   * @return The nearby hole’s direction or an empty value if the chunk is not near an edge.
+   */
   public Optional<HoleDirection> isAtEdge(int chunkX, int chunkZ) {
     if (this.inverted) {
       final var pastX = this.isPastBlockEdge(chunkX, this.offsetX)
@@ -73,6 +92,14 @@ public class ChunkGridManager {
     return Optional.empty();
   }
 
+  /**
+   * If the chunk at the given coordinates is right past a block’s edge,
+   * return the hole’s direction from the chunk’s position, relative to the edge.
+   *
+   * @param chunkX The chunk’s X position.
+   * @param chunkZ The chunk’s Z position.
+   * @return The hole’s direction or an empty value if the chunk is not right past an edge.
+   */
   public Optional<HoleDirection> isPastEdge(int chunkX, int chunkZ) {
     if (this.inverted) {
       final var edgeX = this.isAtBlockEdge(chunkX, this.offsetX)
@@ -139,6 +166,9 @@ public class ChunkGridManager {
     return i;
   }
 
+  /**
+   * Enumeration of all possible hole directions.
+   */
   public enum HoleDirection {
     NORTH(Direction.NORTH),
     SOUTH(Direction.SOUTH),
@@ -155,10 +185,25 @@ public class ChunkGridManager {
       this.horizontalDirections = List.of(horizontalDirections);
     }
 
+    /**
+     * Check whether this hole direction faces the given direction.
+     * A single hole direction may face up to 2 directions.
+     *
+     * @param direction The direction to check.
+     * @return True if this hole direction faces the given direction, false otherwise.
+     */
     public boolean faces(Direction direction) {
       return this.horizontalDirections.contains(direction);
     }
 
+    /**
+     * Return the hole direction for the given axis and axis direction.
+     *
+     * @param axis      An axis, either X or Z.
+     * @param direction An axis direction.
+     * @return The corresponding hole direction.
+     * @throws IllegalArgumentException If the axis is Y.
+     */
     public static HoleDirection forAxisAndDirection(Direction.Axis axis, Direction.AxisDirection direction) {
       return switch (axis) {
         case X -> direction == Direction.AxisDirection.POSITIVE ? EAST : WEST;
@@ -167,6 +212,13 @@ public class ChunkGridManager {
       };
     }
 
+    /**
+     * Return the hole direction for the given X and Z axis directions.
+     *
+     * @param directionX The direction along the X axis.
+     * @param directionZ The direction along the Z axis.
+     * @return The corresponding hole direction.
+     */
     public static HoleDirection forDirections(Direction.AxisDirection directionX, Direction.AxisDirection directionZ) {
       return switch (directionX) {
         case POSITIVE -> switch (directionZ) {

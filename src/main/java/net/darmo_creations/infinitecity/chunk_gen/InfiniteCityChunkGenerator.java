@@ -24,26 +24,28 @@ import static net.darmo_creations.infinitecity.chunk_gen.ChunkGeneratorBlocks.*;
 import static net.darmo_creations.infinitecity.chunk_gen.ChunkPortions.*;
 
 /**
+ * This chunk generator builds a world whose architecture is inspired by the game NaissanceE.
+ * <p>
+ * Layers:
+ * <ol>
+ *  <li>[-2032] Single layer of bedrock
+ *  <li>[-2031, -2030[ Thin layer of terrain blocks with small random elevation changes
+ *  <li>[-2030, -1830[ Empty space with various structures, buildings, bridges, etc.
+ *      that stretch from the previous layer up to the next
+ *  <li>[-1830, -1430[ Plain layer with concentric hollow rings with suspended bridges spanning the gap
+ *  <li>[-1430, -1230[ TODO define
+ *  <li>[-1230, -829[ On-grid blocks with windowed facades
+ *  <li>[-829, -701[ Empty space with structures, hanging walkways and columns around holes of next layer
+ *  <li>[-701, -289[ Plain layer with on-grid square holes containing various structures
+ *  <li>[-289, -161[ Empty space with… TODO define
+ *  <li>[-161, 39[ On-grid blocks
+ *  <li>[39, 2032[ Empty space with desert landscapes atop blocks of previous layer
+ * </ol>
  * Notations:
  * <ul>
- *  <li>[min layer-max layer]
+ *  <li>[min layer,max layer (excluded)[
  *  <li>(block chunk-wise width / block chunk-wise spacing)
  * </ul>
- * Layers: TODO update
- * <ol>
- *  <li>[0] Single layer of bedrock
- *  <li>[1-3] Thin layer of terrain blocks with small random elevation changes
- *  <li>[3-200] Empty space with various structures, buildings, bridges, etc.
- *      that stretch from the previous layer up to the next
- *  <li>[200-400] On-grid floating blocks (16 / 4)
- *  <li>[400-550] Empty space with sand deserts on top of the previous layer
- *  <li>[550-750] Random floating blocks (base unit: 4 / 4) whose sides ares facades with windows
- *  <li>[750-814] Empty space with various structures along with columns that support the blocks above
- *  <li>[814-1014] Plain layer with on-grid vertical holes (6 / 14), centered above the blocks of layer 4
- *  <li>[1014-1114] Empty space
- *  <li>[1114-1328] Random floating blocks (base unit: 8 / random) with hanging catwalks, antennas, grate, doors, etc.
- *      on the bottom and sides
- * </ol>
  */
 public class InfiniteCityChunkGenerator extends ChunkGenerator {
   public static final Codec<InfiniteCityChunkGenerator> CODEC = RecordCodecBuilder.create(
@@ -63,17 +65,17 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
   public static final int LAYER_2 = LAYER_1 + 1; // Thin terrain layer
   public static final int LAYER_3 = LAYER_2 + 1; // Empty space with columns, bridges, arches, etc.
   public static final int LAYER_4 = LAYER_3 + 200; // Plain layer with concentric hollow rings with suspended bridges spanning the gap
-  public static final int LAYER_5 = LAYER_4 + 400; // ?
+  public static final int LAYER_5 = LAYER_4 + 400; // TODO define
   public static final int LAYER_6 = LAYER_5 + 200; // On-grid blocks with windowed facades
   public static final int LAYER_7 = LAYER_6 + FACADE_HEIGHT; // Empty space with structures, hanging walkways and columns around holes of next layer
-  public static final int LAYER_8 = LAYER_7 + COLUMN_HEIGHT; // Plain layer with on-grid square holes
-  public static final int LAYER_9 = LAYER_8 + 412; // Empty space with ?
+  public static final int LAYER_8 = LAYER_7 + COLUMN_HEIGHT; // Plain layer with on-grid square holes containing various structures
+  public static final int LAYER_9 = LAYER_8 + 412; // Empty space with… TODO define
   public static final int LAYER_10 = LAYER_9 + COLUMN_HEIGHT; // On-grid blocks
   public static final int LAYER_11 = LAYER_10 + DESERT_BLOCK_HEIGHT; // Empty space with desert landscapes atop blocks of previous layer
   public static final int TOP = 2032; // Max allowed value
   public static final int WORLD_HEIGHT = TOP - LAYER_1;
 
-  private static final ChunkCirclesManager LAYER_4_CIRCLE_MANAGER = new ChunkCirclesManager(20, 50, 0, 0);
+  private static final ChunkTorusesManager LAYER_4_CIRCLE_MANAGER = new ChunkTorusesManager(20, 50, 0, 0);
   private static final ChunkGridManager LAYER_6_GRID_MANAGER = new ChunkGridManager(14, 4, 0, 0, false);
   private static final List<ChunkGridManager> LAYER_8_GRID_MANAGERS = List.of(
       new ChunkGridManager(8, 28, 12, 12, true),
@@ -87,11 +89,19 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
 
   private final InfiniteCityChunkGeneratorConfig config;
 
+  /**
+   * Create a chunk generator for the given config.
+   *
+   * @param config The config.
+   */
   public InfiniteCityChunkGenerator(InfiniteCityChunkGeneratorConfig config) {
     super(new FixedBiomeSource(config.biome()));
     this.config = config;
   }
 
+  /**
+   * Get this generator’s config.
+   */
   public InfiniteCityChunkGeneratorConfig getConfig() {
     return this.config;
   }

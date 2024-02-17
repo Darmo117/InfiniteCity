@@ -1,16 +1,16 @@
-/**
- * This mixin disables the experimental settings warnings.
- * <p>
- * Code from @rdvdev2 on GitHub. See license in package.
- *
- * @see https://github.com/rdvdev2/DisableCustomWorldsAdvice/tree/1.20.4
- */
 package net.darmo_creations.infinitecity.mixins;
 
 import net.minecraft.server.integrated.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 
+/**
+ * This mixin disables the experimental settings warnings.
+ * <p>
+ * Code from @rdvdev2 on GitHub. See license in package.
+ * <p>
+ * See <a href="https://github.com/rdvdev2/DisableCustomWorldsAdvice/tree/1.20.4">the original code</a>.
+ */
 @Mixin(IntegratedServerLoader.class)
 public abstract class MixinIntegratedServerLoader {
   // Set canShowBackupPrompt = false

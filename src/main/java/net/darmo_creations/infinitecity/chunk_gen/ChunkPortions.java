@@ -10,8 +10,18 @@ import java.util.*;
 
 import static net.darmo_creations.infinitecity.chunk_gen.ChunkGeneratorBlocks.*;
 
+/**
+ * The {@link ChunkPortion}s available for terrain generation.
+ * <p>
+ * All {@link ChunkPortion}s are directed towards the east (south-east for corners) by default,
+ * i.e. when no rotation nor mirroring is applied.
+ * <p>
+ * {@link ChunkPortion}s for all rotations and mirrorings are lazily created and cached.
+ *
+ * @see InfiniteCityChunkGenerator
+ */
 final class ChunkPortions {
-  // Caches
+  // Chunk portion caches
   private static final Map<BlockRotation, ChunkPortion> COLUMN_CORNER = new HashMap<>();
   private static final Map<BlockRotation, Map<BlockMirror, ChunkPortion>> COLUMN_SIDE = new HashMap<>();
   private static final Map<BlockRotation, ChunkPortion> FACADE_EDGES_CORNER = new HashMap<>();
@@ -24,11 +34,17 @@ final class ChunkPortions {
   private static final Map<BlockRotation, ChunkPortion> DESERT_INNER_EDGE_SIDE = new HashMap<>();
   private static final Map<BlockRotation, ChunkPortion> SMALL_ANTENNA_HORIZ = new HashMap<>();
 
-  static ChunkPortion getColumnCorner(BlockRotation rotation) {
+  /**
+   * Return the column corner for the given rotation.
+   */
+  public static ChunkPortion getColumnCorner(BlockRotation rotation) {
     return forRotation(COLUMN_CORNER, rotation, ChunkPortions::initDefaultColumnCorner);
   }
 
-  static ChunkPortion getColumnSide(BlockRotation rotation, BlockMirror mirror) {
+  /**
+   * Return the column side for the given rotation and mirroring.
+   */
+  public static ChunkPortion getColumnSide(BlockRotation rotation, BlockMirror mirror) {
     if (!COLUMN_SIDE.containsKey(BlockRotation.NONE)
         || !COLUMN_SIDE.get(BlockRotation.NONE).containsKey(BlockMirror.NONE))
       initDefaultColumnSide();
@@ -42,42 +58,81 @@ final class ChunkPortions {
     return forRotation.get(mirror);
   }
 
-  static ChunkPortion getFacadeEdgesCorner(BlockRotation rotation) {
+  /**
+   * Return the building facade edge corner (top + bottom) for the given rotation.
+   */
+  public static ChunkPortion getFacadeEdgesCorner(BlockRotation rotation) {
     return forRotation(FACADE_EDGES_CORNER, rotation, ChunkPortions::initDefaultFacadeEdgesCorner);
   }
 
-  static ChunkPortion getFacadeEdgesSide(BlockRotation rotation) {
+  /**
+   * Return the building facade edge side (top + bottom) for the given rotation.
+   */
+  public static ChunkPortion getFacadeEdgesSide(BlockRotation rotation) {
     return forRotation(FACADE_EDGES_SIDE, rotation, ChunkPortions::initDefaultFacadeEdgesSide);
   }
 
-  static ChunkPortion getInnerRingCorner(BlockRotation rotation) {
+  /**
+   * Return the hole inner ring corner for the given rotation.
+   */
+  public static ChunkPortion getInnerRingCorner(BlockRotation rotation) {
     return forRotation(INNER_RING_CORNER, rotation, ChunkPortions::initDefaultInnerRingCorner);
   }
 
-  static ChunkPortion getInnerRingSide(BlockRotation rotation) {
+  /**
+   * Return the hole inner ring side for the given rotation.
+   */
+  public static ChunkPortion getInnerRingSide(BlockRotation rotation) {
     return forRotation(INNER_RING_SIDE, rotation, ChunkPortions::initDefaultInnerRingSide);
   }
 
-  static ChunkPortion getDesertOuterEdgeCorner(BlockRotation rotation) {
+  /**
+   * Return the desert block outer edge corner for the given rotation.
+   */
+  public static ChunkPortion getDesertOuterEdgeCorner(BlockRotation rotation) {
     return forRotation(DESERT_OUTER_EDGE_CORNER, rotation, ChunkPortions::initDefaultDesertOuterEdgeCorner);
   }
 
-  static ChunkPortion getDesertOuterEdgeSide(BlockRotation rotation) {
+  /**
+   * Return the desert block outer edge side for the given rotation.
+   */
+  public static ChunkPortion getDesertOuterEdgeSide(BlockRotation rotation) {
     return forRotation(DESERT_OUTER_EDGE_SIDE, rotation, ChunkPortions::initDefaultDesertOuterEdgeSide);
   }
 
-  static ChunkPortion getDesertInnerEdgeCorner(BlockRotation rotation) {
+  /**
+   * Return the desert block inner edge corner for the given rotation.
+   */
+  public static ChunkPortion getDesertInnerEdgeCorner(BlockRotation rotation) {
     return forRotation(DESERT_INNER_EDGE_CORNER, rotation, ChunkPortions::initDefaultDesertInnerEdgeCorner);
   }
 
-  static ChunkPortion getDesertInnerEdgeSide(BlockRotation rotation) {
+  /**
+   * Return the desert block inner edge side for the given rotation.
+   */
+  public static ChunkPortion getDesertInnerEdgeSide(BlockRotation rotation) {
     return forRotation(DESERT_INNER_EDGE_SIDE, rotation, ChunkPortions::initDefaultDesertInnerEdgeSide);
   }
 
-  static ChunkPortion getSmallHorizontalAntenna(BlockRotation rotation) {
+  /**
+   * Return the small horizontal antenna (3×3×16) for the given rotation.
+   * The antenna is centered at (x = 8, z = 8) when no rotation is applied.
+   */
+  public static ChunkPortion getSmallHorizontalAntenna(BlockRotation rotation) {
     return forRotation(SMALL_ANTENNA_HORIZ, rotation, ChunkPortions::initSmallHorizontalAntenna);
   }
 
+  /**
+   * Return the {@link ChunkPortion} from the given map for a specific rotation,
+   * calling {@code initDefault} first if it does not exist yet.
+   * <p>
+   * This method handles lazy creation and caching.
+   *
+   * @param map         The map to query the portion from.
+   * @param rotation    The rotation to apply to the default portion.
+   * @param initDefault A callback to invoke if the default portion has not been created yet.
+   * @return The portion for the given rotation.
+   */
   private static ChunkPortion forRotation(Map<BlockRotation, ChunkPortion> map, BlockRotation rotation, Callback initDefault) {
     if (!map.containsKey(BlockRotation.NONE))
       initDefault.invoke();
@@ -85,6 +140,10 @@ final class ChunkPortions {
       map.put(rotation, map.get(BlockRotation.NONE).withRotation(rotation));
     return map.get(rotation);
   }
+
+  /*
+   * Methods that create the default chunk portions.
+   */
 
   private static void initDefaultColumnCorner() {
     final int height = InfiniteCityChunkGenerator.COLUMN_HEIGHT;
@@ -299,8 +358,14 @@ final class ChunkPortions {
     SMALL_ANTENNA_HORIZ.put(BlockRotation.NONE, chunkPortion);
   }
 
+  /**
+   * A callback takes no argument and returns nothing.
+   */
   @FunctionalInterface
   private interface Callback {
+    /**
+     * Invoke this callback.
+     */
     void invoke();
   }
 

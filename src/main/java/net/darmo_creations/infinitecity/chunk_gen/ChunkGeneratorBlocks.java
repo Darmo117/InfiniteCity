@@ -3,6 +3,11 @@ package net.darmo_creations.infinitecity.chunk_gen;
 import net.darmo_creations.infinitecity.blocks.*;
 import net.minecraft.block.*;
 
+/**
+ * The blocks available for terrain generation.
+ *
+ * @see InfiniteCityChunkGenerator
+ */
 final class ChunkGeneratorBlocks {
   public static final BlockState AIR = Blocks.AIR.getDefaultState();
   public static final BlockState BEDROCK = Blocks.BEDROCK.getDefaultState();

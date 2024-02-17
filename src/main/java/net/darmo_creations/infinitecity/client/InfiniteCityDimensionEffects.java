@@ -4,13 +4,13 @@ import net.minecraft.client.render.*;
 import net.minecraft.util.math.*;
 
 /**
- * Custom effects for the custom "infinite_city" dimension defined in this mod’s datapack.
+ * Effects for the custom "city" dimension defined in this mod’s datapack.
  * <p>
  * Features:
- * <li>No clouds</li>
- * <li>No skybox</li>
- * <li>Fog</li>
- * <li>No thick fog</li>
+ * <li>No clouds
+ * <li>No skybox
+ * <li>Fog
+ * <li>No thick fog
  */
 public class InfiniteCityDimensionEffects extends DimensionEffects {
   public InfiniteCityDimensionEffects() {

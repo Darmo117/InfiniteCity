@@ -9,7 +9,13 @@ import net.minecraft.block.*;
 import net.minecraft.registry.*;
 import net.minecraft.util.*;
 
+/**
+ * This mod’s main initializer.
+ */
 public class InfiniteCity implements ModInitializer {
+  /**
+   * This mod’s ID.
+   */
   public static final String MOD_ID = "infinitecity";
 
   @Override

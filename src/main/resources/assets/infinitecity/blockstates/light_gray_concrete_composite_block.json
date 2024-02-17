@@ -1,0 +1,89 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "north_west_top": "true"
+      },
+      "apply": {
+        "model": "infinitecity:block/light_gray_concrete_corner_nwt"
+      }
+    },
+    {
+      "when": {
+        "north_west_bottom": "true"
+      },
+      "apply": {
+        "model": "infinitecity:block/light_gray_concrete_corner_nwb"
+      }
+    },
+    {
+      "when": {
+        "north_east_top": "true"
+      },
+      "apply": {
+        "model": "infinitecity:block/light_gray_concrete_corner_nwt",
+        "y": 90,
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "north_east_bottom": "true"
+      },
+      "apply": {
+        "model": "infinitecity:block/light_gray_concrete_corner_nwb",
+        "y": 90,
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "north_west_bottom": "true"
+      },
+      "apply": {
+        "model": "infinitecity:block/light_gray_concrete_corner_nwb",
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "south_east_top": "true"
+      },
+      "apply": {
+        "model": "infinitecity:block/light_gray_concrete_corner_nwt",
+        "y": 180,
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "south_east_bottom": "true"
+      },
+      "apply": {
+        "model": "infinitecity:block/light_gray_concrete_corner_nwb",
+        "y": 180,
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "south_west_top": "true"
+      },
+      "apply": {
+        "model": "infinitecity:block/light_gray_concrete_corner_nwt",
+        "y": 270,
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "south_west_bottom": "true"
+      },
+      "apply": {
+        "model": "infinitecity:block/light_gray_concrete_corner_nwb",
+        "y": 270,
+        "uvlock": true
+      }
+    }
+  ]
+}

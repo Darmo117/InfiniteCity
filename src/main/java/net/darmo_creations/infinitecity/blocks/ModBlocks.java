@@ -36,6 +36,10 @@ public final class ModBlocks {
       "light_gray_concrete_post",
       new PostBlock(Blocks.LIGHT_GRAY_CONCRETE.getSettings())
   );
+  public static final CompositeBlock LIGHT_GRAY_CONCRETE_COMPOSITE_BLOCK = register(
+      "light_gray_concrete_composite_block",
+      new CompositeBlock(Blocks.LIGHT_GRAY_CONCRETE.getSettings())
+  );
   public static final Block[] LIGHT_BLOCKS = new Block[15];
 
   static {
@@ -82,6 +86,7 @@ public final class ModBlocks {
       content.addAfter(LIGHT_GRAY_CONCRETE_VSLAB, LIGHT_GRAY_CONCRETE_WALL.asItem());
       content.addAfter(LIGHT_GRAY_CONCRETE_WALL, LIGHT_GRAY_CONCRETE_THICK_POST.asItem());
       content.addAfter(LIGHT_GRAY_CONCRETE_THICK_POST, LIGHT_GRAY_CONCRETE_POST.asItem());
+      content.addAfter(LIGHT_GRAY_CONCRETE_POST, LIGHT_GRAY_CONCRETE_COMPOSITE_BLOCK.asItem());
     });
 
     ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {

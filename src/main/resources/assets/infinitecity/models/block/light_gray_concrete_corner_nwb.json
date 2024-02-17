@@ -1,0 +1,6 @@
+{
+	"parent": "infinitecity:block/corner_nwb",
+	"textures": {
+		"all": "minecraft:block/light_gray_concrete"
+	}
+}

@@ -275,24 +275,24 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     for (int y = topY; y - 3 > bottomY; y -= 3) {
       for (int d = 1; d < 15; d += 2) {
         if (holeDirection.faces(Direction.NORTH) || holeDirection.faces(Direction.SOUTH)) {
-          final int z = holeDirection.faces(Direction.NORTH) ? 0 : 15;
-          setBlock(chunk, mutable, chunkX, chunkZ, d, z, y - 2, GLASS_PANE_X);
-          setBlock(chunk, mutable, chunkX, chunkZ, d, z, y - 3, GLASS_PANE_X);
-          final int z1 = z + (holeDirection.faces(Direction.NORTH) ? 1 : -1);
-          final double sample = sampler.sample(getHPos(chunkX, d), y, z1);
+          final int dz = holeDirection.faces(Direction.NORTH) ? 0 : 15;
+          setBlock(chunk, mutable, chunkX, chunkZ, d, dz, y - 2, GLASS_PANE_X);
+          setBlock(chunk, mutable, chunkX, chunkZ, d, dz, y - 3, GLASS_PANE_X);
+          final int dz1 = dz + (holeDirection.faces(Direction.NORTH) ? 1 : -1);
+          final double sample = sampler.sample(getHPos(chunkX, d), y, getHPos(chunkZ, dz1));
           final BlockState blockState = getBlockState.apply(sample);
-          setBlock(chunk, mutable, chunkX, chunkZ, d, z1, y - 2, blockState);
-          setBlock(chunk, mutable, chunkX, chunkZ, d, z1, y - 3, blockState);
+          setBlock(chunk, mutable, chunkX, chunkZ, d, dz1, y - 2, blockState);
+          setBlock(chunk, mutable, chunkX, chunkZ, d, dz1, y - 3, blockState);
         }
         if (holeDirection.faces(Direction.WEST) || holeDirection.faces(Direction.EAST)) {
-          final int x = holeDirection.faces(Direction.WEST) ? 0 : 15;
-          setBlock(chunk, mutable, chunkX, chunkZ, x, d, y - 2, GLASS_PANE_Z);
-          setBlock(chunk, mutable, chunkX, chunkZ, x, d, y - 3, GLASS_PANE_Z);
-          final int x1 = x + (holeDirection.faces(Direction.WEST) ? 1 : -1);
-          final double sample = sampler.sample(x1, y, getHPos(chunkZ, d));
+          final int dx = holeDirection.faces(Direction.WEST) ? 0 : 15;
+          setBlock(chunk, mutable, chunkX, chunkZ, dx, d, y - 2, GLASS_PANE_Z);
+          setBlock(chunk, mutable, chunkX, chunkZ, dx, d, y - 3, GLASS_PANE_Z);
+          final int dx1 = dx + (holeDirection.faces(Direction.WEST) ? 1 : -1);
+          final double sample = sampler.sample(getHPos(chunkX, dx1), y, getHPos(chunkZ, d));
           final BlockState blockState = getBlockState.apply(sample);
-          setBlock(chunk, mutable, chunkX, chunkZ, x1, d, y - 2, blockState);
-          setBlock(chunk, mutable, chunkX, chunkZ, x1, d, y - 3, blockState);
+          setBlock(chunk, mutable, chunkX, chunkZ, dx1, d, y - 2, blockState);
+          setBlock(chunk, mutable, chunkX, chunkZ, dx1, d, y - 3, blockState);
         }
         if (d == 5) d += 3; // Leave 4-block empty space at middle
       }
@@ -424,7 +424,33 @@ public class InfiniteCityChunkGenerator extends ChunkGenerator {
     final int chunkZ = chunkPos.z;
     // TODO generate structures in layers 3, 7, 9 and 11
     // TODO generate features in gaps between windows on facades of layer 6
+    this.generateFacadeStructures(chunk, mutable, chunkX, chunkZ, structureAccessor);
     generateBaseLayerElevation(chunk, mutable, chunkX, chunkZ, structureAccessor);
+  }
+
+  private void generateFacadeStructures(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {
+    final int yOffset = 10;
+    final var sampler = DoublePerlinNoiseSampler.create(getRandom(structureAccessor), 0, 1.0);
+    final double threshold = 0.75;
+    LAYER_6_GRID_MANAGER.isPastEdge(chunkX, chunkZ).ifPresent(dir -> {
+      for (int y = LAYER_6 + yOffset; y < LAYER_7 - yOffset; y++) {
+        for (int d = 7; d < 9; d++) {
+          final int dOffset = d - 8; // 8 = offset of antenna’s center
+          switch (dir) {
+            case NORTH, SOUTH -> {
+              if (sampler.sample(getHPos(chunkX, d), y, getHPos(chunkZ, 8)) > threshold)
+                getSmallHorizontalAntenna(dir.faces(Direction.NORTH) ? BlockRotation.COUNTERCLOCKWISE_90 : BlockRotation.CLOCKWISE_90)
+                    .placeInWorld(chunk, mutable, chunkX, chunkZ, dOffset + (dir.faces(Direction.SOUTH) ? 1 : 0), 0, y);
+            }
+            case EAST, WEST -> {
+              if (sampler.sample(getHPos(chunkX, 8), y, getHPos(chunkZ, d)) > threshold)
+                getSmallHorizontalAntenna(dir.faces(Direction.WEST) ? BlockRotation.CLOCKWISE_180 : BlockRotation.NONE)
+                    .placeInWorld(chunk, mutable, chunkX, chunkZ, 0, dOffset + (dir.faces(Direction.WEST) ? 1 : 0), y);
+            }
+          }
+        }
+      }
+    });
   }
 
   private static void generateBaseLayerElevation(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, StructureAccessor structureAccessor) {

@@ -1,5 +1,6 @@
 package net.darmo_creations.infinitecity.chunk_gen;
 
+import net.darmo_creations.infinitecity.blocks.*;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.*;
 import net.minecraft.util.*;
@@ -21,6 +22,7 @@ final class ChunkPortions {
   private static final Map<BlockRotation, ChunkPortion> DESERT_OUTER_EDGE_SIDE = new HashMap<>();
   private static final Map<BlockRotation, ChunkPortion> DESERT_INNER_EDGE_CORNER = new HashMap<>();
   private static final Map<BlockRotation, ChunkPortion> DESERT_INNER_EDGE_SIDE = new HashMap<>();
+  private static final Map<BlockRotation, ChunkPortion> SMALL_ANTENNA_HORIZ = new HashMap<>();
 
   static ChunkPortion getColumnCorner(BlockRotation rotation) {
     return forRotation(COLUMN_CORNER, rotation, ChunkPortions::initDefaultColumnCorner);
@@ -70,6 +72,10 @@ final class ChunkPortions {
 
   static ChunkPortion getDesertInnerEdgeSide(BlockRotation rotation) {
     return forRotation(DESERT_INNER_EDGE_SIDE, rotation, ChunkPortions::initDefaultDesertInnerEdgeSide);
+  }
+
+  static ChunkPortion getSmallHorizontalAntenna(BlockRotation rotation) {
+    return forRotation(SMALL_ANTENNA_HORIZ, rotation, ChunkPortions::initSmallHorizontalAntenna);
   }
 
   private static ChunkPortion forRotation(Map<BlockRotation, ChunkPortion> map, BlockRotation rotation, Callback initDefault) {
@@ -268,6 +274,29 @@ final class ChunkPortions {
     chunkPortion.fill(16 - h, 16, 16 - h, 16, smallBlockBottomY, height, TERRAIN);
 
     DESERT_INNER_EDGE_SIDE.put(BlockRotation.NONE, chunkPortion);
+  }
+
+  private static void initSmallHorizontalAntenna() {
+    final ChunkPortion chunkPortion = new ChunkPortion(3);
+
+    final BlockState stairsWest = STAIRS.with(StairsBlock.FACING, Direction.WEST);
+    final BlockState composite = COMPOSITE.with(CompositeBlock.NORTH_WEST_BOTTOM, true)
+        .with(CompositeBlock.NORTH_WEST_TOP, true)
+        .with(CompositeBlock.NORTH_EAST_BOTTOM, true)
+        .with(CompositeBlock.NORTH_EAST_TOP, true)
+        .with(CompositeBlock.SOUTH_WEST_BOTTOM, true)
+        .with(CompositeBlock.SOUTH_WEST_TOP, true);
+    final BlockState thickPostH = THICK_POST.with(ThickPostBlock.AXIS, Direction.Axis.X);
+    final BlockState postH = POST.with(PostBlock.AXIS, Direction.Axis.X);
+    chunkPortion.setBlock(0, 8, 0, stairsWest.with(StairsBlock.HALF, BlockHalf.TOP));
+    chunkPortion.setBlock(0, 8, 2, stairsWest);
+    chunkPortion.setBlock(0, 7, 1, composite.mirror(BlockMirror.LEFT_RIGHT));
+    chunkPortion.setBlock(0, 9, 1, composite);
+    chunkPortion.fill(0, 2, 8, 9, 1, 2, TERRAIN);
+    chunkPortion.fill(2, 9, 8, 9, 1, 2, thickPostH);
+    chunkPortion.fill(9, 16, 8, 9, 1, 2, postH);
+
+    SMALL_ANTENNA_HORIZ.put(BlockRotation.NONE, chunkPortion);
   }
 
   @FunctionalInterface

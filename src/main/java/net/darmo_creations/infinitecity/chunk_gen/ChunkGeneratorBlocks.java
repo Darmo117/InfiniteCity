@@ -15,6 +15,9 @@ final class ChunkGeneratorBlocks {
   public static final BlockState GLASS_PANE_Z = GLASS_PANE.with(PaneBlock.NORTH, true).with(PaneBlock.SOUTH, true);
   public static final BlockState SAND = Blocks.SAND.getDefaultState();
   public static final BlockState STAIRS = ModBlocks.LIGHT_GRAY_CONCRETE_STAIRS.getDefaultState();
+  public static final BlockState COMPOSITE = ModBlocks.LIGHT_GRAY_CONCRETE_COMPOSITE_BLOCK.getDefaultState();
+  public static final BlockState THICK_POST = ModBlocks.LIGHT_GRAY_CONCRETE_THICK_POST.getDefaultState();
+  public static final BlockState POST = ModBlocks.LIGHT_GRAY_CONCRETE_POST.getDefaultState();
 
   private ChunkGeneratorBlocks() {
   }

@@ -66,14 +66,22 @@ class ChunkPortion {
     this.setBlock(x, z, this.blockStates.length - y - 1, topBlockState);
   }
 
-  public void placeInWorld(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int bottomY) {
+  public void placeInWorld(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int atY) {
+    this.placeInWorld(chunk, mutable, chunkX, chunkZ, 0, 0, atY);
+  }
+
+  public void placeInWorld(Chunk chunk, BlockPos.Mutable mutable, int chunkX, int chunkZ, int atX, int atZ, int atY) {
     for (int dy = 0; dy < this.blockStates.length; dy++) {
       final ChunkLayerBBox bBox = this.bBoxes[dy];
-      final int y = bottomY + dy;
+      final int y = atY + dy;
       for (int dz = bBox.minZ(); dz <= bBox.maxZ(); dz++) {
-        final int z = ChunkGenerationUtils.getHPos(chunkZ, dz);
+        final int trueZ = atZ + dz;
+        if (trueZ < 0 || trueZ >= 16) continue;
+        final int z = ChunkGenerationUtils.getHPos(chunkZ, trueZ);
         for (int dx = bBox.minX(); dx <= bBox.maxX(); dx++) {
-          final int x = ChunkGenerationUtils.getHPos(chunkX, dx);
+          final int trueX = atX + dx;
+          if (trueX < 0 || trueX >= 16) continue;
+          final int x = ChunkGenerationUtils.getHPos(chunkX, trueX);
           final BlockState state = this.blockStates[dy][dz][dx];
           if (state != null)
             chunk.setBlockState(mutable.set(x, y, z), state, false);

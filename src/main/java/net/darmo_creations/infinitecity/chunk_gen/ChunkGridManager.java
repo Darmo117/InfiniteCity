@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * This chunk manager generates blocks of specific width and spacing.
  */
-public class ChunkGridManager {
+class ChunkGridManager {
   private final int blockSize;
   private final int blockSpacing;
   private final int offsetX;

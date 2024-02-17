@@ -3,7 +3,7 @@ package net.darmo_creations.infinitecity.chunk_gen;
 /**
  * This chunk manager generates concentric toruses of specific width and spacing.
  */
-public class ChunkTorusesManager {
+class ChunkTorusesManager {
   private final int torusWidth;
   private final int torusSpacing;
   private final int offsetX;
